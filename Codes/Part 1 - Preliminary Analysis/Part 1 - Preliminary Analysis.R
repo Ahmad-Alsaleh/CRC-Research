@@ -158,9 +158,8 @@ create.lefse.dataset = function() {
 lefse.dataset = create.lefse.dataset()
 
 # exporting LEfSe dataset
-'
 write.table(lefse.dataset, "/LEfSe_dataset.txt")
-'
+
 
 # alpha diversity ----
 plot = plot_richness(phy.seq, x = "Diagnosis", color = "Sex", measures = c("Chao1", "Shannon","simpson","ace"))
@@ -258,14 +257,3 @@ abundances.difference = abundances.table$Abundances.CRC - abundances.table$Abund
 abundances.difference = data.frame(Bacteria = rownames(abundances.table), Abundances.Difference = abundances.difference)
 abundances.difference = abundances.difference[order(-abs(abundances.difference$Abundances.Difference)), ]
 abundances.difference
-
-# ----
-
-
-
-
-
-
-
-
-

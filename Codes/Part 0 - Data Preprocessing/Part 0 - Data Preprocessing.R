@@ -87,37 +87,3 @@ View(taxonomy)
 # exporting datasets to excel files ----
 write.xlsx(combined_data, "/Users/ahmad/AUS/Research/Cancer Project/Output Datasets/dataset.xlsx")
 write.xlsx(taxonomy, "/Users/ahmad/AUS/Research/Cancer Project/Output Datasets/taxonomy.xlsx")
-
-# ----
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

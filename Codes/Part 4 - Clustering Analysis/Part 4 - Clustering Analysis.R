@@ -69,31 +69,3 @@ data = data[, c(features, "Diagnosis")]
 
 # clustering the observations
 kmeans.clusters(data)
-
-# ----
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

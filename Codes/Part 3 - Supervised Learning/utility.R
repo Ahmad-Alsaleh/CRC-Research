@@ -119,37 +119,3 @@ compute.AUCs = function(data, imp.features, predict.func, model.func, ..., folds
 	rownames(cv.AUCs) = NULL
 	return(cv.AUCs)
 }
-
-# ----
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

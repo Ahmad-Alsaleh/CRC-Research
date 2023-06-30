@@ -110,16 +110,3 @@ gplot$labels$fill = "Relative Abundance (%)"
 gplot + geom_vline(xintercept = 47.5, color = "black", size = 1.5, linetype = "dashed") +
 	ggtitle("Relative Abundance of Top 50 Features")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
