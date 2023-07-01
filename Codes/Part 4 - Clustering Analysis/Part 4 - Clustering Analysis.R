@@ -25,12 +25,12 @@ plot.clusters = function(clustering.scores, title) {
 	ggplot(clustering.scores, aes(x = PC1, y = PC2, color = Cluster, shape = Diagnosis)) +
 		labs(x = "Principal Component 1", y = "Principal Component 2",
 				 subtitle = sprintf("Accuracy: %.2f", find.clustering.accuracy(clustering.scores))) +
-		geom_point(size = 3) + ggtitle(title) + theme(plot.title = element_text(hjust = 0.5))
+		geom_point(size = 5, alpha = 0.8) + ggtitle(title) + theme(plot.title = element_text(hjust = 0.5))
 }
 
 # function to run K-means clustering on PCA scores and then plotting
 # the clusters in 2D using the first two clusters
-kmeans.clusters = function(data) {
+kmeans.clusters = function(data, title) {
 	# finding PCA scores
 	pca.scores = prcomp(data[, -ncol(data)])$x %>% as.data.frame
 	
@@ -41,13 +41,13 @@ kmeans.clusters = function(data) {
 	pca.scores$Diagnosis = data$Diagnosis
 	
 	# plotting clusters
-	plot.clusters(pca.scores, "PCA K-Means Clustering Using Important Features")
+	plot.clusters(pca.scores, title)
 	
 }
 
 # reading dataset ----
 data = readxl::read_excel(
-	"/Users/ahmad/AUS/Research/Cancer Project/Output Datasets/Analysis Dataset.xlsx") %>% 
+	"/Users/ahmad/AUS/Research/CRC Research/Output Datasets/Analysis Dataset.xlsx") %>% 
 	as.data.frame %>% (textshape::column_to_rownames)
 data$Diagnosis = as.factor(data$Diagnosis)
 
@@ -56,16 +56,16 @@ data[, -ncol(data)] = data[, -ncol(data)] %>% scale
 # PCA k-means clustering using all features ----
 
 # clustering the observations
-kmeans.clusters(data)
+kmeans.clusters(data, "PCA K-Means Clustering Using All Features")
 
 
 # PCA k-means clustering using important features ----
 
 # extracting important features
-features = read_excel("/Users/ahmad/AUS/Research/Cancer Project/Output Datasets/Final Selected OTUs.xlsx")
+features = read_excel("/Users/ahmad/AUS/Research/CRC Research/Output Datasets/Final Selected OTUs.xlsx")
 features = features$OTU[1:30] # TODO: make this as 60 when exporting the file (use a scree plot with a vertical line)
 
 data = data[, c(features, "Diagnosis")]
 
 # clustering the observations
-kmeans.clusters(data)
+kmeans.clusters(data, "PCA K-Means Clustering Using Important Features")

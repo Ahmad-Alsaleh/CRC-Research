@@ -74,7 +74,7 @@ otu.data[, -nzv.vars]
 rm(nzv.vars)
 '
 # finding number of OTU's per group ----
-# TODO: I think no need for this (check the paper)
+# TODO: I think no need for this (check the paper). if removed, make it in a separate commit (to go back easily)
 otu.sum = rowsum(otu.data, meta.data$Diagnosis)
 
 crc.otus = which(otu.sum["CRC", ] != 0)
