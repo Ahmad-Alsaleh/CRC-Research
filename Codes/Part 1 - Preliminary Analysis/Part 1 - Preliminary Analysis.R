@@ -30,7 +30,7 @@ library(summarytools)
 summarytools::view(stby(meta.data$Age, meta.data$Diagnosis, descr, transpose = T, stats = c("mean", "sd")))
 summarytools::view(stby(meta.data$Age, meta.data$Sex, descr, transpose = T, stats = c("mean", "sd")))
 summarytools::view(dfSummary(meta.data, plain.ascii = F, style = "grid", graph.magnif = 0.75,
-							 valid.col = F, tmp.img.dir = "/tmp"))
+														 valid.col = F, tmp.img.dir = "/tmp"))
 
 # univariate tests on metadata ----
 
@@ -82,7 +82,7 @@ normal.otus = which(otu.sum["Normal", ] != 0)
 
 length(crc.otus)
 length(normal.otus)
-length(intersect(crc.otus, normal.otus))
+length(intersect(crc.otus, normal.otus)) / ncol(otu.data)
 
 rm(crc.otus, normal.otus, otu.sum)
 
@@ -94,15 +94,13 @@ p_values = sort(p_values, decreasing = T)
 
 # using a scree plot to choose a cut-off (at the elbow)
 library(ggplot2)
-scree.plot = ggplot(data.frame(index = 1:length(p_values), p_value = p_values),
-			 aes(x = index, y = p_value)) +	geom_line()
+scree.plot = ggplot(data.frame(Index = 1:length(p_values), p_value = p_values),
+										aes(x = Index, y = p_value)) +	geom_line()
 scree.plot
 
-# TODO: try to run the whole analysis when cutoff = 440 (export the graph with x axis way longer than y)
 cutoff = 955
-
 scree.plot + geom_vline(xintercept = cutoff, linetype = "dashed", color = "red") +
-	geom_text(x = cutoff - 150, y = 0.1, label = paste("index =", cutoff), color = "red")
+	geom_text(x = cutoff, y = 0.1, hjust = -0.1, label = paste("Index =", cutoff), color = "red")
 
 selected.features = names(p_values[(cutoff+1):length(p_values)])
 otu.data = otu.data[, selected.features]
@@ -132,7 +130,7 @@ taxonomy.data = biom_taxonomy(biom.data)
 res = as.data.frame(t(stri_list2matrix(taxonomy.data)))
 rownames(res) = names(taxonomy.data)
 colnames(res) = c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
-# TODO: change this to match the name of the previous taxa level concatenated
+# TODO: change this to match the name of the previous taxa level concatenated (maybe reem did it)
 # with `_Unclassified`
 res[is.na(res)] = "Empty Cell"
 

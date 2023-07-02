@@ -28,15 +28,18 @@ kmeans.clusters(data, "PCA K-Means Clustering Using All Features")
 # PCA k-means clustering using important features ----
 
 # extracting important features
-# TODO: in Part 3, add a column of the scores values (mostly make it col 2)
 features = read_excel("Output Datasets/Final Selected OTUs.xlsx")
 
 # using scree plot to choose cutoff for top features
+scree.plot = ggplot(data.frame(index = 1:nrow(features), score = features$score),
+										aes(x = index, y = score)) + geom_line() + labs(x = "OTU Index", y = "Score")
+scree.plot
 
-# TODO: (use a scree plot with a vertical line).
-cutoff = 30
+cutoff = 35
+scree.plot + geom_vline(xintercept = cutoff, linetype = "dashed", color = "red") +
+	geom_text(x = cutoff, y = 0.1, hjust = -0.1, label = paste("Index =", cutoff), color = "red")
+
 features = features$OTU[1:cutoff]
-
 data = data[, c(features, "Diagnosis")]
 
 # clustering the observations

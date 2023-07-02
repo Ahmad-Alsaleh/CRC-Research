@@ -84,7 +84,12 @@ final.subset.name = "BAM"
 final.subset = imp.features[, final.subset.name]
 taxonomy = readxl::read_excel("Output Datasets/taxonomy.xlsx") %>% 
 	(textshape::column_to_rownames)
-final.featrues = data.frame(OTU = final.subset,
+
+scores = readxl::read_excel("Output Datasets/Bootstrapped Importance Scores.xlsx") %>% 
+	(textshape::column_to_rownames) %>% as.data.frame
+scores = scores[final.subset, final.subset.name]
+
+final.featrues = data.frame(OTU = final.subset, score = scores,
 														taxonomy[final.subset, c("Family", "Genus", "Species")])
 xlsx::write.xlsx(final.featrues, "Output Datasets/Final Selected OTUs.xlsx", row.names = F)
 
