@@ -13,7 +13,7 @@ set.seed(42)
 
 # loading data set ----
 library(readxl)
-data = as.data.frame(read_excel("/Users/ahmad/AUS/Research/Cancer Project/Output Datasets/dataset.xlsx"))
+data = as.data.frame(read_excel("Output Datasets/dataset.xlsx"))
 data = textshape::column_to_rownames(data)
 
 data$Sex = as.factor(data$Sex)
@@ -98,7 +98,9 @@ scree.plot = ggplot(data.frame(index = 1:length(p_values), p_value = p_values),
 			 aes(x = index, y = p_value)) +	geom_line()
 scree.plot
 
+# TODO: try to run the whole analysis when cutoff = 440 (export the graph with x axis way longer than y)
 cutoff = 955
+
 scree.plot + geom_vline(xintercept = cutoff, linetype = "dashed", color = "red") +
 	geom_text(x = cutoff - 150, y = 0.1, label = paste("index =", cutoff), color = "red")
 
@@ -107,14 +109,16 @@ otu.data = otu.data[, selected.features]
 
 rm(scree.plot, selected.features, cutoff, p_values)
 
-# shuffling the data set ----
-otu.data = data.frame(otu.data, Diagnosis = meta.data$Diagnosis) # adding response to the last column
+# adding response to the last column
+otu.data = data.frame(otu.data, Diagnosis = meta.data$Diagnosis)
+
+# shuffling the data set
 otu.data = otu.data[sample(nrow(otu.data)), ]
 
 # exporting analysis dataset ----
 # this is the cleaned data set that to be used for further analysis. 
 library(xlsx)
-write.xlsx(otu.data, "/Users/ahmad/AUS/Research/Cancer Project/Output Datasets/Analysis Dataset.xlsx")
+write.xlsx(otu.data, "Output Datasets/Analysis Dataset.xlsx")
 
 # Ecological Assessment Methods ----
 
@@ -123,7 +127,7 @@ library(biomformat)
 library(qiimer)
 library(stringi)
 
-biom.data = read_biom("/Users/ahmad/AUS/Research/Cancer Project/Original Datasets/BIOM Files/OTU_table.biom")
+biom.data = read_biom("Original Datasets/BIOM Files/OTU_table.biom")
 taxonomy.data = biom_taxonomy(biom.data)
 res = as.data.frame(t(stri_list2matrix(taxonomy.data)))
 rownames(res) = names(taxonomy.data)
@@ -135,7 +139,7 @@ res[is.na(res)] = "Empty Cell"
 taxonomy.data = res
 rm(res, biom.data)
 
-write.xlsx(taxonomy.data, "/Users/ahmad/AUS/Research/Cancer Project/Output Datasets/taxonomy.xlsx")
+write.xlsx(taxonomy.data, "Output Datasets/taxonomy.xlsx")
 
 # creating phyloseq object
 library(phyloseq)
@@ -159,7 +163,6 @@ lefse.dataset = create.lefse.dataset()
 
 # exporting LEfSe dataset
 write.table(lefse.dataset, "/LEfSe_dataset.txt")
-
 
 # alpha diversity ----
 plot = plot_richness(phy.seq, x = "Diagnosis", color = "Sex", measures = c("Chao1", "Shannon","simpson","ace"))

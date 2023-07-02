@@ -18,6 +18,7 @@ May 27th 2022.
 "
 
 # Requirements ----
+# TODO: remove this (or some of it)
 "
 -	Change the paths of the dataset and the features files (both files shluld be
 	of type xlsx).
@@ -31,29 +32,21 @@ May 27th 2022.
 
 "
 
-directory_path = "/Users/ahmad/AUS/Research/Cancer Project/Codes/Part 3 - Supervised Learning"
-dataset_path   = "/Users/ahmad/AUS/Research/Cancer Project/Output Datasets/Analysis Dataset.xlsx"
-features_path  = "/Users/ahmad/AUS/Research/Cancer Project/Output Datasets/Top Features.xlsx"
-
 # libraries ----
 set.seed(42)
-setwd(directory_path)
-source("utility.R")
 library(dplyr)
+source("Codes/Part 3 - Supervised Learning/utility.R")
 
 # reading files ----
 
 # reading the dataset file
-data = readxl::read_excel(dataset_path) %>% as.data.frame %>%
+data = readxl::read_excel("Output Datasets/Analysis Dataset.xlsx") %>% as.data.frame %>%
 	(textshape::column_to_rownames)
 colnames(data)[ncol(data)] = "y"
 data$y = as.factor(data$y)
 
 # reading the features file
-imp.features = readxl::read_excel(features_path) %>% as.data.frame
-
-# memory cleanup
-rm(directory_path, dataset_path, features_path)
+imp.features = readxl::read_excel("Output Datasets/Top Features.xlsx") %>% as.data.frame
 
 # fitting models and plotting AUC graphs ----
 
@@ -65,7 +58,8 @@ SVM.plot = generatePlot(SVM.AUC, "SVM")
 
 # KNN (k = sqrt(n)) ---
 KNN.predict.func = function(model.fit, data.test)
-	predict(model.fit, data.test[, -ncol(data.test)], type = "prob")[, levels(data.test$y)[2]]
+	# TODO: check if [1] or [2] is needed bellow (print it in the function). [1] gives better graph
+	predict(model.fit, data.test[, -ncol(data.test)], type = "prob")[, levels(data.test$y)[1]]
 KNN.AUC = compute.AUCs(data, imp.features, KNN.predict.func, e1071::gknn, k = floor(sqrt(nrow(data))))
 KNN.plot = generatePlot(KNN.AUC, expression(bold(paste("KNN (k = ", sqrt(n), ")"))))
 
@@ -88,11 +82,11 @@ gridExtra::grid.arrange(SVM.plot, KNN.plot, NB.plot, RF.plot, nrow = 2, ncol = 2
 final.subset.name = "BAM"
 
 final.subset = imp.features[, final.subset.name]
-taxonomy = readxl::read_excel("/Users/ahmad/AUS/Research/Cancer Project/Output Datasets/taxonomy.xlsx") %>% 
+taxonomy = readxl::read_excel("Output Datasets/taxonomy.xlsx") %>% 
 	(textshape::column_to_rownames)
 final.featrues = data.frame(OTU = final.subset,
 														taxonomy[final.subset, c("Family", "Genus", "Species")])
-xlsx::write.xlsx(final.featrues, "/Users/ahmad/AUS/Research/Cancer Project/Output Datasets/Final Selected OTUs.xlsx", row.names = F)
+xlsx::write.xlsx(final.featrues, "Output Datasets/Final Selected OTUs.xlsx", row.names = F)
 
 # heatmap of relative abundance of the selected variables
 # TODO:

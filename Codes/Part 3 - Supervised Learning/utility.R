@@ -115,7 +115,7 @@ compute.AUCs = function(data, imp.features, predict.func, model.func, ..., folds
 	# combining AUCs values of the k folds (using the arithmetic mean)
 	cv.AUCs = cv.AUCs %>% abind::abind(along = 3) %>%
 		apply(1:2, mean) %>% as.data.frame
-	cv.AUCs = cbind(subset.sizes, cv.AUCs)
+	cv.AUCs = cbind(subset.size = subset.sizes, cv.AUCs)
 	rownames(cv.AUCs) = NULL
 	return(cv.AUCs)
 }

@@ -33,12 +33,11 @@ library(dplyr)
 set.seed(42)
 
 # loading data set ----
-data = read_excel("/Users/ahmad/AUS/Research/Cancer Project/Output Datasets/Analysis Dataset.xlsx") %>%
-	as.data.frame
-data = textshape::column_to_rownames(data)
+data = read_excel("Output Datasets/Analysis Dataset.xlsx") %>% 
+	as.data.frame %>% (textshape::column_to_rownames)
 data$Diagnosis = as.factor(data$Diagnosis)
 colnames(data)[ncol(data)] = "y"
-str(data[, (ncol(data) - 5):ncol(data)])
+str(data[, (ncol(data) - 3):ncol(data)])
 
 # helper functions ----
 normalize = function(x) {
@@ -197,14 +196,14 @@ colnames(top.features) = c("IG", "SU", "MR", "CS", "RF", "BAM")
 # exporting results ----
 write.csv(
 	bootstraps,
-	"/Users/ahmad/AUS/Research/Cancer Project/Output Datasets/Bootstraps.csv"
+	"Output Datasets/Bootstraps.csv"
 )
 write.xlsx(
 	aggregated.scores,
-	"/Users/ahmad/AUS/Research/Cancer Project/Output Datasets/Bootstrapped Importance Scores.xlsx"
+	"Output Datasets/Bootstrapped Importance Scores.xlsx"
 )
 write.xlsx(
 	top.features,
-	"/Users/ahmad/AUS/Research/Cancer Project/Output Datasets/Top Features.xlsx",
+	"Output Datasets/Top Features.xlsx",
 	row.names = F
 )

@@ -16,11 +16,10 @@ source("Codes/Part 4 - Clustering Analysis/utility.R")
 
 # reading and scaling the dataset
 data = readxl::read_excel(
-	"/Users/ahmad/AUS/Research/CRC Research/Output Datasets/Analysis Dataset.xlsx") %>% 
+	"Output Datasets/Analysis Dataset.xlsx") %>% 
 	as.data.frame %>% (textshape::column_to_rownames)
 data$Diagnosis = as.factor(data$Diagnosis)
 
-# TODO: try without this
 data[, -ncol(data)] = data[, -ncol(data)] %>% scale
 
 # clustering the observations
@@ -29,10 +28,14 @@ kmeans.clusters(data, "PCA K-Means Clustering Using All Features")
 # PCA k-means clustering using important features ----
 
 # extracting important features
-features = read_excel("/Users/ahmad/AUS/Research/CRC Research/Output Datasets/Final Selected OTUs.xlsx")
+# TODO: in Part 3, add a column of the scores values (mostly make it col 2)
+features = read_excel("Output Datasets/Final Selected OTUs.xlsx")
 
 # using scree plot to choose cutoff for top features
-features = features$OTU[1:30] # TODO: make this as 60 when exporting the file (use a scree plot with a vertical line)
+
+# TODO: (use a scree plot with a vertical line).
+cutoff = 30
+features = features$OTU[1:cutoff]
 
 data = data[, c(features, "Diagnosis")]
 
