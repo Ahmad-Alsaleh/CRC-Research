@@ -54,8 +54,7 @@ SVM.plot = generatePlot(SVM.AUC, "SVM")
 
 # KNN (k = sqrt(n)) ---
 KNN.predict.func = function(model.fit, data.test)
-	# TODO: check if [1] or [2] is needed bellow (print it in the function). [1] gives better graph
-	predict(model.fit, data.test[, -ncol(data.test)], type = "prob")[, levels(data.test$y)[1]]
+	predict(model.fit, data.test[, -ncol(data.test)], type = "prob")[, levels(data.test$y)[2]]
 KNN.AUC = compute.AUCs(data, imp.features, KNN.predict.func, e1071::gknn, k = floor(sqrt(nrow(data))))
 KNN.plot = generatePlot(KNN.AUC, expression(bold(paste("KNN (k = ", sqrt(n), ")"))))
 
@@ -101,8 +100,9 @@ phy.seq = phyloseq(OTU, TAX)
 sample_data(phy.seq) = data[, 1:3]
 
 phy.seq = prune_taxa(taxa_sums(phy.seq) > 0, phy.seq)
-gpac = prune_taxa(final.featrues$OTU[1:50], phy.seq)
+phy.seq = transform_sample_counts(phy.seq, function(x) x / sum(x) * 100)
 
+gpac = prune_taxa(final.featrues$OTU[1:50], phy.seq)
 gplot = plot_heatmap(gpac, sample.label = "Diagnosis",taxa.label = "Genus",
 										 sample.order = "Diagnosis", low="#66CCFF", high="#000033",
 										 na.value="white")
