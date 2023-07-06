@@ -85,7 +85,7 @@ wam = function(data) {
 		column_to_rownames(var = "Row.names")
 	colnames(scores)[ncol(scores)] = "Chi.Squared"
 	
-	# updating the progress bar
+	# updating the progress
 	done_percent = round(iteration_i / num_bootstraps * 100, 1)
 	text = paste("Iteration: ",
 							 iteration_i,
@@ -96,8 +96,7 @@ wam = function(data) {
 							 "%)",
 							 sep = "")
 	print(text)
-	tcltk::setTkProgressBar(progress.bar, iteration_i, label = text)
-	
+
 	# return importance scores of a single bootstrap
 	return(scores)
 }
@@ -105,12 +104,6 @@ wam = function(data) {
 # requirements for the wam() function ---
 num_bootstraps = 500
 iteration_i = 0
-progress.bar = tcltk::tkProgressBar(
-	title = "Progress Bar",
-	min = 0,
-	max = num_bootstraps,
-	width = 300
-)
 
 # Feature Selection Part 1: Filter methods ----
 start.time = Sys.time()
