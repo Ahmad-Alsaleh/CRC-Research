@@ -74,7 +74,6 @@ otu.data[, -nzv.vars]
 rm(nzv.vars)
 '
 # finding number of OTU's per group ----
-# TODO: I think no need for this (check the paper). if removed, make it in a separate commit (to go back easily)
 otu.sum = rowsum(otu.data, meta.data$Diagnosis)
 
 crc.otus = which(otu.sum["CRC", ] != 0)
@@ -95,7 +94,7 @@ p_values = sort(p_values, decreasing = T)
 # using a scree plot to choose a cut-off (at the elbow)
 library(ggplot2)
 scree.plot = ggplot(data.frame(Index = 1:length(p_values), p_value = p_values),
-										aes(x = Index, y = p_value)) +	geom_line()
+										aes(x = Index, y = p_value)) + geom_line() + labs(x = "OTU Index")
 scree.plot
 
 cutoff = 955
@@ -141,11 +140,8 @@ write.xlsx(taxonomy.data, "Output Datasets/taxonomy.xlsx")
 
 # creating phyloseq object
 library(phyloseq)
-otu_test = as.matrix(t(data[, -(1:3)]))
-tax_test = as.matrix(taxonomy.data)
-
-OTU = otu_table(otu_test, taxa_are_rows = T)
-TAX = tax_table(tax_test)
+OTU = t(data[, -(1:3)]) %>% as.matrix %>% otu_table(taxa_are_rows = T)
+TAX = taxonomy.data %>% as.matrix %>% tax_table
 
 phy.seq = phyloseq(OTU, TAX)
 sample_data(phy.seq) = meta.data
@@ -160,7 +156,7 @@ create.lefse.dataset = function() {
 lefse.dataset = create.lefse.dataset()
 
 # exporting LEfSe dataset
-write.table(lefse.dataset, "/LEfSe_dataset.txt")
+## write.table(lefse.dataset, "/LEfSe_dataset.txt")
 
 # alpha diversity ----
 plot = plot_richness(phy.seq, x = "Diagnosis", color = "Sex", measures = c("Chao1", "Shannon","simpson","ace"))
@@ -258,3 +254,4 @@ abundances.difference = abundances.table$Abundances.CRC - abundances.table$Abund
 abundances.difference = data.frame(Bacteria = rownames(abundances.table), Abundances.Difference = abundances.difference)
 abundances.difference = abundances.difference[order(-abs(abundances.difference$Abundances.Difference)), ]
 abundances.difference
+
