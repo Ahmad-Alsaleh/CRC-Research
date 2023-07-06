@@ -10,6 +10,7 @@ Ahmad Alsaleh
 "
 
 # libraries ----
+rm(list = ls())
 library(readxl)
 library(xlsx)
 library(dplyr)

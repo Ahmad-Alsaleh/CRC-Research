@@ -5,6 +5,7 @@ can accurately cluster the patients into two distinct clusters: CRC and Normal.
 "
 
 # libraries ----
+rm(list = ls())
 library(stats)
 library(ggplot2)
 library(ggbiplot)

@@ -27,6 +27,7 @@ May 27th 2022.
 
 # libraries ----
 set.seed(42)
+rm(list = ls())
 library(dplyr)
 library(phyloseq)
 library(readxl)

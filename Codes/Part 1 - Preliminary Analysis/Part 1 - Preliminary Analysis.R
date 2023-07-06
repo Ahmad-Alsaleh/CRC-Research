@@ -9,24 +9,34 @@ and identify significant differences between groups in microbial data.
 
 "
 
+# libraries ----
 set.seed(42)
+rm(list = ls())
+library(biomformat)
+library(qiimer)
+library(stringi)
+library(readxl)
+library(taRifx)
+library(summarytools)
+library(ggplot2)
+library(xlsx)
+library(vegan)
+library(dplyr)
+library(phyloseq)
 
 # loading data set ----
-library(readxl)
 data = as.data.frame(read_excel("Output Datasets/dataset.xlsx"))
 data = textshape::column_to_rownames(data)
 
 data$Sex = as.factor(data$Sex)
 data$Diagnosis = as.factor(data$Diagnosis)
 
-library(taRifx)
 data = japply(data, which(sapply(data, is.numeric)), as.integer)
 
 meta.data = data[1:3]
 otu.data = data[-(1:3)]
 
 # summary statistics ----
-library(summarytools)
 summarytools::view(stby(meta.data$Age, meta.data$Diagnosis, descr, transpose = T, stats = c("mean", "sd")))
 summarytools::view(stby(meta.data$Age, meta.data$Sex, descr, transpose = T, stats = c("mean", "sd")))
 summarytools::view(dfSummary(meta.data, plain.ascii = F, style = "grid", graph.magnif = 0.75,
@@ -92,7 +102,6 @@ p_values = sapply(otu.data, function(col)
 p_values = sort(p_values, decreasing = T)
 
 # using a scree plot to choose a cut-off (at the elbow)
-library(ggplot2)
 scree.plot = ggplot(data.frame(Index = 1:length(p_values), p_value = p_values),
 										aes(x = Index, y = p_value)) + geom_line() + labs(x = "OTU Index")
 scree.plot
@@ -114,16 +123,11 @@ otu.data = otu.data[sample(nrow(otu.data)), ]
 
 # exporting analysis dataset ----
 # this is the cleaned data set that to be used for further analysis. 
-library(xlsx)
 write.xlsx(otu.data, "Output Datasets/Analysis Dataset.xlsx")
 
 # Ecological Assessment Methods ----
 
 # reading taxonomy data
-library(biomformat)
-library(qiimer)
-library(stringi)
-
 biom.data = read_biom("Original Datasets/BIOM Files/OTU_table.biom")
 taxonomy.data = biom_taxonomy(biom.data)
 res = as.data.frame(t(stri_list2matrix(taxonomy.data)))
@@ -139,7 +143,6 @@ rm(res, biom.data)
 write.xlsx(taxonomy.data, "Output Datasets/taxonomy.xlsx")
 
 # creating phyloseq object
-library(phyloseq)
 OTU = t(data[, -(1:3)]) %>% as.matrix %>% otu_table(taxa_are_rows = T)
 TAX = taxonomy.data %>% as.matrix %>% tax_table
 
@@ -173,7 +176,6 @@ richness.p.values = sapply(richness[, -ncol(richness)], function(x)
 p.adjust(richness.p.values, method = "fdr")
 
 # beta diversity ----
-library(vegan)
 phy.seq = transform_sample_counts(phy.seq, function(x) x / sum(x) * 100)##
 bray.dist = distance(phy.seq, method = "bray")
 anosim(bray.dist, sample_data(phy.seq)$Diagnosis)
@@ -191,7 +193,6 @@ plot = plot_bar(phy.seq.merged.top.20, "Diagnosis", fill = "Phylum") + coord_fli
 plot
 
 # comparing abundance values
-library(dplyr)
 abundances = data.frame(Diagnosis = as.factor(plot$data$Diagnosis), Bacteria = as.factor(plot$data$Phylum), Abundance = plot$data$Abundance)
 abundances = abundances %>%
 	group_by(Diagnosis, Bacteria) %>%
