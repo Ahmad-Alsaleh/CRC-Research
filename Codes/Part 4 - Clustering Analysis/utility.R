@@ -9,7 +9,7 @@ find.clustering.accuracy = function(clustering.scores) {
 plot.clusters = function(clustering.scores, title) {
 	ggplot(clustering.scores, aes(x = PC1, y = PC2, color = Cluster, shape = Diagnosis)) +
 		labs(x = "Principal Component 1", y = "Principal Component 2",
-				 subtitle = sprintf("Accuracy: %.1f%%", find.clustering.accuracy(clustering.scores) * 100)) +
+				 subtitle = sprintf("Clustering Accuracy: %.1f%%", find.clustering.accuracy(clustering.scores) * 100)) +
 		geom_point(size = 5, alpha = 0.8) + ggtitle(title) +
 		theme(plot.title = element_text(hjust = 0.5)) +
 		geom_point(size = 1, color = "black", alpha = 0.2)

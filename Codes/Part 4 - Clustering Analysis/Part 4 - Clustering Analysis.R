@@ -31,15 +31,22 @@ kmeans.clusters(data, "PCA K-Means Clustering Using All Features")
 features = read_excel("Output Datasets/Final Selected OTUs.xlsx")
 
 # using scree plot to choose cutoff for top features
-scree.plot = ggplot(data.frame(index = 1:nrow(features), score = features$score),
-										aes(x = index, y = score)) + geom_line() + labs(x = "OTU Index", y = "Score")
+scree.plot = ggplot(data.frame(index = 1:nrow(features), score = features$BAM.Score),
+										aes(x = index, y = score)) + geom_line() + labs(x = "OTU Index", y = "BAM Score")
 scree.plot
 
-cutoff = 35
-scree.plot + geom_vline(xintercept = cutoff, linetype = "dashed", color = "red") +
-	geom_text(x = cutoff, y = 0.1, hjust = -0.1, label = paste("Index =", cutoff), color = "red")
+# horizontal line
+h.cutoff = 0.22
+scree.plot + geom_hline(yintercept = h.cutoff, linetype = "dashed", color = "red")
 
-features = features$OTU[1:cutoff]
+v.cutoff = which(features$BAM.Score < h.cutoff)[1]
+
+# vertical line
+scree.plot + geom_vline(xintercept = v.cutoff, linetype = "dashed", color = "red") +
+	geom_hline(yintercept = h.cutoff, linetype = "dashed", color = "red") +
+	geom_text(x = v.cutoff, y = 0.1, hjust = -0.1, label = paste("OTU Index =", v.cutoff), color = "red")
+
+features = features$OTU[1:v.cutoff]
 data = data[, c(features, "Diagnosis")]
 
 # clustering the observations
