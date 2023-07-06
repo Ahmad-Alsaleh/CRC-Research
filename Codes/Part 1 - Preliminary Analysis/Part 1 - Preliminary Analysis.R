@@ -255,4 +255,3 @@ abundances.difference = abundances.table$Abundances.CRC - abundances.table$Abund
 abundances.difference = data.frame(Bacteria = rownames(abundances.table), Abundances.Difference = abundances.difference)
 abundances.difference = abundances.difference[order(-abs(abundances.difference$Abundances.Difference)), ]
 abundances.difference
-
