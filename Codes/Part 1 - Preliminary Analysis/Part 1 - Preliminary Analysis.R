@@ -12,6 +12,7 @@ and identify significant differences between groups in microbial data.
 # libraries ----
 set.seed(42)
 rm(list = ls())
+source("Codes/Part 1 - Preliminary Analysis/utility.R")
 library(biomformat)
 library(qiimer)
 library(stringi)
@@ -147,36 +148,10 @@ tax$Family = str_c('F_', tax$Family)
 tax$Genus = str_c('G_', tax$Genus)
 tax$Species = str_c('S_', tax$Species)
 
-tax.clean = tax
-for (i in 1:7) {
-	tax.clean[, i] <- as.character(tax.clean[, i])
-}
+# handling unclassified (NA) values
+taxonomy.data = handl.unclassified.values(tax)
 
-# filling missing taxonomy
-tax.clean[is.na(tax.clean)] <- ""
-for (i in 1:nrow(tax.clean)) {
-	if (tax.clean[i, 2] == "") {
-		kingdom <- paste0(tax.clean[i, 1], "_Unclassified")
-		tax.clean[i, 2:7] <- kingdom
-	} else if (tax.clean[i, 3] == "") {
-		phylum <- paste0(tax.clean[i, 2], "_Unclassified")
-		tax.clean[i, 3:7] <- phylum
-	} else if (tax.clean[i, 4] == "") {
-		class <- paste0(tax.clean[i, 3], "_Unclassified")
-		tax.clean[i, 4:7] <- class
-	} else if (tax.clean[i, 5] == "") {
-		order <- paste0(tax.clean[i, 4], "_Unclassified")
-		tax.clean[i, 5:7] <- order
-	} else if (tax.clean[i, 6] == "") {
-		family <- paste0(tax.clean[i, 5], "_Unclassified")
-		tax.clean[i, 6:7] <- family
-	} else if (tax.clean[i, 7] == "") {
-		tax.clean$Species[i] <-
-			paste(tax.clean$Genus[i], "_Unclassified", sep = "")
-	}
-}
-taxonomy.data = tax.clean
-rm(tax, tax.clean, biom.data)
+rm(tax, biom.data)
 
 write.xlsx(taxonomy.data, "Output Datasets/taxonomy.xlsx")
 
@@ -194,89 +169,6 @@ phy.seq = prune_taxa(taxa_sums(phy.seq) > 0, phy.seq)
 phy.seq = transform_sample_counts(phy.seq, function(x) x / sum(x))
 
 # creating LEfSe dataset for Galaxy platform
-create.lefse.dataset = function(physeq_pruned) {
-	taxonomy_data <- as.data.frame(tax_table(physeq_pruned))
-	colnames(taxonomy_data) <- paste0("taxonomy", seq(1:7))
-	
-	ps_kingdom <- tax_glom(physeq_pruned, "Kingdom")
-	taxa_names(ps_kingdom)
-	taxa_names(ps_kingdom) <- tax_table(ps_kingdom)[, 1]
-	taxa_names(ps_kingdom)
-	otu_kingdom = as.data.frame(otu_table(ps_kingdom))
-	
-	ps_phylum <- tax_glom(physeq_pruned, "Phylum")
-	taxa_names(ps_phylum)
-	taxa_names(ps_phylum) <- tax_table(ps_phylum)[, 2]
-	taxa_names(ps_phylum)
-	otu_phylum = as.data.frame(otu_table(ps_phylum))
-	
-	match_phylum = taxonomy_data$taxonomy1[match(rownames(otu_phylum), taxonomy_data$taxonomy2)]
-	new_names_otu_phylum = paste0(match_phylum, "|", rownames(otu_phylum))
-	rownames(otu_phylum) = new_names_otu_phylum
-	
-	ps_class <- tax_glom(physeq_pruned, "Class")
-	taxa_names(ps_class)
-	taxa_names(ps_class) <- tax_table(ps_class)[, 3]
-	taxa_names(ps_class)
-	otu_class = as.data.frame(otu_table(ps_class))
-	
-	match_class = taxonomy_data$taxonomy2[match(rownames(otu_class), taxonomy_data$taxonomy3)]
-	match_phylum = taxonomy_data$taxonomy1[match(match_class, taxonomy_data$taxonomy2)]
-	new_names_otu_class = paste0(match_phylum, "|",
-															 match_class, "|", rownames(otu_class))
-	rownames(otu_class) = new_names_otu_class
-	
-	ps_order <- tax_glom(physeq_pruned, "Order")
-	taxa_names(ps_order)
-	taxa_names(ps_order) <- tax_table(ps_order)[, 4]
-	taxa_names(ps_order)
-	otu_order = as.data.frame(otu_table(ps_order))
-	
-	match_order = taxonomy_data$taxonomy3[match(rownames(otu_order), taxonomy_data$taxonomy4)]
-	match_class = taxonomy_data$taxonomy2[match(match_order, taxonomy_data$taxonomy3)]
-	match_phylum = taxonomy_data$taxonomy1[match(match_class, taxonomy_data$taxonomy2)]
-	new_names_otu_order = paste0(match_phylum, "|", match_class, "|", match_order, "|",
-															 rownames(otu_order))
-	
-	rownames(otu_order) = new_names_otu_order
-	
-	ps_family <- tax_glom(physeq_pruned, "Family")
-	taxa_names(ps_family)
-	taxa_names(ps_family) <- tax_table(ps_family)[, 5]
-	taxa_names(ps_family)
-	otu_family = as.data.frame(otu_table(ps_family))
-	
-	match_family = taxonomy_data$taxonomy4[match(rownames(otu_family), taxonomy_data$taxonomy5)]
-	match_order = taxonomy_data$taxonomy3[match(match_family, taxonomy_data$taxonomy4)]
-	match_class = taxonomy_data$taxonomy2[match(match_order, taxonomy_data$taxonomy3)]
-	match_phylum = taxonomy_data$taxonomy1[match(match_class, taxonomy_data$taxonomy2)]
-	new_names_otu_family = paste0(match_phylum, "|", match_class, "|", match_order,
-																"|", match_family, "|", rownames(otu_family))
-	
-	rownames(otu_family) = new_names_otu_family
-	
-	ps_genus <- tax_glom(physeq_pruned, "Genus")
-	taxa_names(ps_genus)
-	taxa_names(ps_genus) <- tax_table(ps_genus)[, 6]
-	taxa_names(ps_genus)
-	otu_genus = as.data.frame(otu_table(ps_genus))
-	
-	match_genus = taxonomy_data$taxonomy5[match(rownames(otu_genus), taxonomy_data$taxonomy6)]
-	match_family = taxonomy_data$taxonomy4[match(match_genus, taxonomy_data$taxonomy5)]
-	match_order = taxonomy_data$taxonomy3[match(match_family, taxonomy_data$taxonomy4)]
-	match_class = taxonomy_data$taxonomy2[match(match_order, taxonomy_data$taxonomy3)]
-	match_phylum = taxonomy_data$taxonomy1[match(match_class, taxonomy_data$taxonomy2)]
-	new_names_otu_genus = paste0(match_phylum, "|", match_class, "|", match_order, 
-															 "|", match_family, "|", match_genus, "|", rownames(otu_genus))
-	rownames(otu_genus) = new_names_otu_genus
-	
-	Diagnosis = as.character(sample_data(physeq_pruned)$Diagnosis)
-	galaxy = rbind(
-		Diagnosis = Diagnosis, otu_kingdom, otu_phylum, otu_class, otu_order,
-		otu_family, otu_genus, make.row.names = T)
-	print(galaxy)
-	return(galaxy)
-}
 lefse.dataset = create.lefse.dataset(phy.seq)
 
 # exporting LEfSe dataset
