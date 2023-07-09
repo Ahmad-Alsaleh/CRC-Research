@@ -165,9 +165,6 @@ sample_data(phy.seq) = meta.data
 # pruning unnecessary columns
 phy.seq = prune_taxa(taxa_sums(phy.seq) > 0, phy.seq)
 
-#transform counts to proportions(optional)
-phy.seq = transform_sample_counts(phy.seq, function(x) x / sum(x))
-
 # creating LEfSe dataset for Galaxy platform
 lefse.dataset = create.lefse.dataset(phy.seq)
 

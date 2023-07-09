@@ -1,4 +1,6 @@
 create.lefse.dataset = function(physeq_pruned) {
+	physeq_pruned = transform_sample_counts(physeq_pruned, function(x) x / sum(x))
+	
 	taxonomy_data <- as.data.frame(tax_table(physeq_pruned))
 	colnames(taxonomy_data) <- paste0("taxonomy", seq(1:7))
 	
@@ -78,7 +80,7 @@ create.lefse.dataset = function(physeq_pruned) {
 	galaxy = rbind(
 		Diagnosis = Diagnosis, otu_kingdom, otu_phylum, otu_class, otu_order,
 		otu_family, otu_genus, make.row.names = T)
-	print(galaxy)
+	
 	return(galaxy)
 }
 
