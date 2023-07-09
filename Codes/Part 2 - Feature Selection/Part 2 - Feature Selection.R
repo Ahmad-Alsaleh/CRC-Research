@@ -23,6 +23,7 @@ Ahmad Alsaleh
 
 # libraries ----
 rm(list = ls())
+source("Codes/Part 2 - Feature Selection/utility.R")
 library(readxl)
 library(splitstackshape)
 library(FSelector)
@@ -38,88 +39,19 @@ data = read_excel("Output Datasets/Analysis Dataset.xlsx") %>%
 	as.data.frame %>% (textshape::column_to_rownames)
 data$Diagnosis = as.factor(data$Diagnosis)
 colnames(data)[ncol(data)] = "y"
-str(data[, (ncol(data) - 3):ncol(data)])
-
-# helper functions ----
-normalize = function(x) {
-	return((x - min(x)) / (max(x) - min(x)))
-}
-
-# function that performs WAM on a single bootstrap ----
-
-# feature selection techniques: Information Gain,
-# Symmetric Uncertainty, MRMR, Chi-Squared
-
-# Preconditions:
-# The target variable is named "y"
-
-wam = function(data) {
-	iteration_i <<- iteration_i + 1
-	
-	# using different seed for each bootstrap
-	set.seed(iteration_i)
-	
-	# getting stratified sample
-	d = as.data.frame(stratified(data, "y", size = 0.999, replace = T))
-	
-	# Information Gain (IG)
-	scores = information.gain(y ~ ., d)
-	colnames(scores)[ncol(scores)] = "Information.Gain"
-	
-	# Symmetric Uncertainty (SU)
-	scores = cbind(scores, symmetrical.uncertainty(y ~ ., d))
-	colnames(scores)[ncol(scores)] = "Symmetric.Uncertainty"
-	
-	# Minimum Redundancy Maximum Relevance (MRMR)
-	d.mrmr = MRMR(d[,!(colnames(d) %in% c("y"))], d$y, ncol(d) - 1)$score
-	scores = merge(scores, d.mrmr, by = "row.names", all = T)
-	scores = scores %>%
-		remove_rownames() %>%
-		column_to_rownames(var = "Row.names")
-	colnames(scores)[ncol(scores)] = "MRMR"
-	
-	# Chi-Squared (CS)
-	d.chi = chi.squared(y ~ ., d)
-	scores = merge(scores, d.chi, by = "row.names", all = T)
-	scores = scores %>%
-		remove_rownames() %>%
-		column_to_rownames(var = "Row.names")
-	colnames(scores)[ncol(scores)] = "Chi.Squared"
-	
-	# updating the progress
-	done_percent = round(iteration_i / num_bootstraps * 100, 1)
-	text = paste("Iteration: ",
-							 iteration_i,
-							 "/",
-							 num_bootstraps,
-							 " (",
-							 done_percent,
-							 "%)",
-							 sep = "")
-	print(text)
-
-	# return importance scores of a single bootstrap
-	return(scores)
-}
+str(data[, (ncol(data) - 2):ncol(data)])
 
 # requirements for the wam() function ---
-num_bootstraps = 500
-iteration_i = 0
 
 # Feature Selection Part 1: Filter methods ----
-start.time = Sys.time()
-bootstraps = replicate(num_bootstraps, wam(data), simplify = F)
-bootstraps = abind::abind(bootstraps, along = 3)
-excution.time = Sys.time() - start.time
-excution.time
+aggregated.scores = wam(data)
 
-# aggregating results (WAM)
-aggregated.scores = apply(bootstraps, c(1, 2), mean)
 
 # TODO: check if this is correct:
 "
 In WAM, scores of Random Forest is not included in WAB since it is not a filter
-method but it is included in the BAM. Is this correct? See the picture I sent.
+method but it is included in the BAM. (I have a feeling this is wrong).
+
 "
 
 # Feature Selection Part 2: Embedded and wrapper methods (machine learning) ----
@@ -157,12 +89,8 @@ library(plotROC)
 roc.plot = ggplot(rf.model$pred[rf.model$pred$mtry == rf.model$finalModel$mtry,],
 									aes(m = Normal, d = factor(obs, levels = c("Normal", "CRC")))) +
 	geom_roc(n.cuts = 0) + coord_equal() + style_roc()
-roc.plot = roc.plot + annotate("text",
-															 x = 0.75,
-															 y = 0.25,
-															 label = paste("AUC =", round((calc_auc(
-															 	roc.plot
-															 ))$AUC, 4)))
+roc.plot = roc.plot + annotate("text", x = 0.75, y = 0.25, label =
+															 	paste("AUC =", round((calc_auc(roc.plot))$AUC, 4)))
 roc.plot
 
 # plotting variables importance
@@ -188,16 +116,6 @@ top.features = as.data.frame(top.features)
 colnames(top.features) = c("IG", "SU", "MR", "CS", "RF", "BAM")
 
 # exporting results ----
-write.csv(
-	bootstraps,
-	"Output Datasets/Bootstraps.csv"
-)
-write.xlsx(
-	aggregated.scores,
-	"Output Datasets/Bootstrapped Importance Scores.xlsx"
-)
-write.xlsx(
-	top.features,
-	"Output Datasets/Top Features.xlsx",
-	row.names = F
-)
+write.csv(bootstraps, "Output Datasets/Bootstraps.csv")
+write.xlsx(aggregated.scores, "Output Datasets/Bootstrapped Importance Scores.xlsx")
+write.xlsx(top.features, "Output Datasets/Top Features.xlsx", row.names = F)
