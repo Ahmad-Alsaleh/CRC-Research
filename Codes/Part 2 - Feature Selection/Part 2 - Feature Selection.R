@@ -32,6 +32,8 @@ library(tibble)
 library(xlsx)
 library(caret)
 library(dplyr)
+library(ggplot2)
+library(plotROC)
 set.seed(42)
 
 # loading data set ----
@@ -84,8 +86,6 @@ rf.model = train(
 rf.model
 
 # plotting ROC curve
-library(ggplot2)
-library(plotROC)
 roc.plot = ggplot(rf.model$pred[rf.model$pred$mtry == rf.model$finalModel$mtry,],
 									aes(m = Normal, d = factor(obs, levels = c("Normal", "CRC")))) +
 	geom_roc(n.cuts = 0) + coord_equal() + style_roc()
@@ -102,7 +102,14 @@ var.imp.rf = var.imp.rf$importance[rownames(aggregated.scores),][, 1]
 aggregated.scores = data.frame(aggregated.scores, `Random Forest` = var.imp.rf)
 
 # BAM (aggregating using arithmetic mean) ----
+
+# normalizing scores
 aggregated.scores = as.data.frame(apply(aggregated.scores, 2, normalize))
+
+# TODO (Dr. Ayman): is this how BAM should be computed? I am basically computing the 
+# mean of all WAM scores. But note that I normalized before computing the mean.
+
+# computing BAM
 aggregated.scores$BAM = apply(aggregated.scores, 1, mean)
 
 # sorting by score for each method ----

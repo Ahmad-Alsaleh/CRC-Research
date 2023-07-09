@@ -5,12 +5,8 @@
 
 # Preconditions:
 # - The target variable is named "y"
-# - Uses a global variable called `iteration_i`. Must be initialized to zero
-#		before calling the function
-
-single.wam_ = function(data) {
-	iteration_i <<- iteration_i + 1
-	
+# - `iteration_i` must increase in each iteration as it is used for setting the seed
+single.wam_ = function(data, iteration_i, num_bootstraps) {
 	# using different seed for each bootstrap
 	set.seed(iteration_i)
 	
@@ -41,12 +37,12 @@ single.wam_ = function(data) {
 		column_to_rownames(var = "Row.names")
 	colnames(scores)[ncol(scores)] = "Chi.Squared"
 	
-	# updating the progress
+	# printing updated progress
 	done_percent = round(iteration_i / num_bootstraps * 100, 1)
 	text = paste("Iteration: ", iteration_i, "/", num_bootstraps, " (",
 							 done_percent, "%)", sep = "")
 	print(text)
-
+	
 	# return importance scores of a single bootstrap
 	return(scores)
 }
@@ -59,13 +55,22 @@ normalize = function(x) {
 # performs WAM on `data` ----
 # Preconditions:
 # - The target variable is named "y"
-
-# TODO: try to use multi-core processing for replicate()
+# TODO (Dr. Ayman):
+# Please check if WAM is implemented correctly, especially if
+# the aggreagation and normalization are done in the right place.
+# I am using `apply(bootstraps, 1:2, mean)` to aggreagate the scores of each bootstrap. 
 
 wam = function(data, num_bootstraps = 500) {
 	iteration_i = 0
-	bootstraps = replicate(num_bootstraps, single.wam_(data), simplify = F) %>%
-		abind::abind(along = 3) %>% apply(1:2, mean)
 	
-	return(bootstraps)
+	# bootstrapping `num_bootstraps` times
+	bootstraps = replicate(num_bootstraps, simplify = F, expr = { # TODO (Ahmad Alsaleh): try to use multi-core processing for replicate()
+		iteration_i <<- iteration_i + 1
+		single.wam_(data, iteration_i, num_bootstraps)
+	}) %>% abind::abind(along = 3)
+	
+	# aggreagating scores of all bootstraps using the arithmatice mean
+	aggregated.bootstraps = apply(bootstraps, 1:2, mean)
+	
+	return(aggregated.bootstraps)
 }
