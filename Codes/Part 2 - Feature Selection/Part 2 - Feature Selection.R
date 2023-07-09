@@ -49,7 +49,7 @@ str(data[, (ncol(data) - 2):ncol(data)])
 aggregated.scores = wam(data)
 
 
-# TODO: check if this is correct:
+# TODO (Dr. Ayman) check if this is correct:
 "
 In WAM, scores of Random Forest is not included in WAB since it is not a filter
 method but it is included in the BAM. (I have a feeling this is wrong).
@@ -123,6 +123,5 @@ top.features = as.data.frame(top.features)
 colnames(top.features) = c("IG", "SU", "MR", "CS", "RF", "BAM")
 
 # exporting results ----
-write.csv(bootstraps, "Output Datasets/Bootstraps.csv")
 write.xlsx(aggregated.scores, "Output Datasets/Bootstrapped Importance Scores.xlsx")
 write.xlsx(top.features, "Output Datasets/Top Features.xlsx", row.names = F)
