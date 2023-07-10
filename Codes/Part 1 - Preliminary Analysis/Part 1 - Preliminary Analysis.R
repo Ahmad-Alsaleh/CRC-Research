@@ -149,7 +149,7 @@ tax$Genus = str_c('G_', tax$Genus)
 tax$Species = str_c('S_', tax$Species)
 
 # handling unclassified (NA) values
-taxonomy.data = handl.unclassified.values(tax)
+taxonomy.data = handle.unclassified.values(tax)
 
 rm(tax, biom.data)
 

@@ -85,7 +85,7 @@ create.lefse.dataset = function(physeq_pruned) {
 }
 
 # replaces NA with [PREVIOUS]_Unclassified
-handl.unclassified.values = function(tax) {
+handle.unclassified.values = function(tax) {
 	for (i in 1:7) {
 		tax[, i] <- as.character(tax[, i])
 	}
