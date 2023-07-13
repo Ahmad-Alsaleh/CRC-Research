@@ -112,7 +112,7 @@ scree.plot
 
 cutoff = 955
 scree.plot + geom_vline(xintercept = cutoff, linetype = "dashed", color = "red") +
-	geom_text(x = cutoff, y = 0.1, hjust = -0.1, label = paste("Index =", cutoff), color = "red")
+	geom_text(x = cutoff, y = 0.1, hjust = -0.1, label = paste0("Index = ", cutoff), color = "red")
 
 selected.features = names(p_values[(cutoff + 1):length(p_values)])
 otu.data = otu.data[, selected.features]

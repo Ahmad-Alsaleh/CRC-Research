@@ -41,7 +41,7 @@ generatePlot = function(AUC.values, model.name) {
 # Computes a single AUC value for a given subset of features with a given subset size ----
 compute.AUC_ = function(features, data.train, data.test, predict.func, subset.size, model.func, ...) {
 	# creating formula
-	formula = features[1:subset.size, ] %>% paste(collapse = " + ") %>% paste("y ~", .) %>% as.formula
+	formula = features[1:subset.size, ] %>% paste0(collapse = "+") %>% paste0("y~", .) %>% as.formula
 	# fitting model
 	model.fit = model.func(formula = formula, data = data.train, ...)
 	

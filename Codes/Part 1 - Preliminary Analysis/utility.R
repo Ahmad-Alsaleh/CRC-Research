@@ -109,7 +109,7 @@ handle.unclassified.values = function(tax) {
 			tax[i, 6:7] <- family
 		} else if (tax[i, 7] == "") {
 			tax$Species[i] <-
-				paste(tax$Genus[i], "_Unclassified", sep = "")
+				paste0(tax$Genus[i], "_Unclassified")
 		}
 	}
 	

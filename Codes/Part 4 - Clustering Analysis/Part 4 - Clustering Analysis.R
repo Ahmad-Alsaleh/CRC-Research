@@ -45,7 +45,7 @@ v.cutoff = which(features$BAM.Score < h.cutoff)[1]
 # vertical line
 scree.plot + geom_vline(xintercept = v.cutoff, linetype = "dashed", color = "red") +
 	geom_hline(yintercept = h.cutoff, linetype = "dashed", color = "red") +
-	geom_text(x = v.cutoff, y = 0.1, hjust = -0.1, label = paste("OTU Index =", v.cutoff), color = "red")
+	geom_text(x = v.cutoff, y = 0.1, hjust = -0.1, label = paste0("OTU Index = ", v.cutoff), color = "red")
 
 features = features$OTU[1:v.cutoff]
 data = data[, c(features, "Diagnosis")]
