@@ -30,11 +30,11 @@ generatePlot = function(AUC.values, model.name) {
 		ggtitle(model.name) +
 		theme(plot.title = element_text(hjust = 0.5, face = "bold")) +
 		scale_x_continuous(trans = reverselog_trans_()) +
-		geom_line(aes(linetype = variable), linewidth = 1) +
-		labs(linetype = "FS Method", color = "FS Method")
-	plot = plot + scale_y_continuous(
-		breaks = seq(min(plot$data$value), max(plot$data$value), length.out = 5),
-		labels = scales::label_number(accuracy = 0.01))
+		geom_line(linetype = "dotdash", linewidth = 1) +
+		labs(linetype = "FS Method", color = "FS Method") + scale_y_continuous(
+			breaks = seq(min(plot$data$value), max(plot$data$value), length.out = 5),
+			labels = scales::label_number(accuracy = 0.01))
+	
 	return(plot)
 }
 
@@ -74,7 +74,7 @@ compute.AUC_ = function(features, data.train, data.test, predict.func, subset.si
 # `subset.sizes`: a vector containing the different number of features to be
 #				used when fitting the model. If a single value is passed then it
 #				corresponds to the number of subset sizes to use.
-											 
+
 compute.AUCs = function(data, imp.features, predict.func, model.func, ..., folds = 5, subset.sizes = 10) {
 	if (length(folds) == 1)
 		folds = caret::createFolds(data$y, k = folds)
@@ -100,9 +100,9 @@ compute.AUCs = function(data, imp.features, predict.func, model.func, ..., folds
 	}
 	
 	# cross validation to find AUC values
-	cv.AUCs = parallel::mclapply(folds, mc.cores = cores_n, function(fold) {
+	cv.AUCs = parallel::mclapply(folds, mc.cores = cores_n, FUN = function(fold) {
 		for(feature_i in 1:ncol(imp.features)) {
-			for (subset.size_i in 1:length(subset.sizes)) {
+			for(subset.size_i in 1:length(subset.sizes)) {
 				set.seed(42)
 				AUCs[subset.size_i, feature_i] =
 					compute.AUC_(imp.features[feature_i], data[-fold, ], data[fold, ],
