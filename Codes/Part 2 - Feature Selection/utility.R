@@ -6,41 +6,39 @@
 # Preconditions:
 # - The target variable is named "y"
 # - `iteration_i` must increase in each iteration as it is used for setting the seed
-single.wam_ = function(data, iteration_i, num_bootstraps) {
+single.bootstrap_ = function(data, iteration_i, num_bootstraps) {
 	# using different seed for each bootstrap
 	set.seed(iteration_i)
 	
 	# getting stratified sample
 	d = as.data.frame(stratified(data, "y", size = 0.999, replace = T))
 	
+	# importance scores of the features
+	scores = matrix(nrow = ncol(d) - 1, ncol = 5, dimnames =
+										list(colnames(d)[1:(ncol(d)-1)], c("IG", "SU", "MR", "CS", "BAM")))
+	
 	# Information Gain (IG)
-	scores = information.gain(y ~ ., d)
-	colnames(scores)[ncol(scores)] = "Information.Gain"
+	scores[, "IG"] = information.gain(y ~ ., d)[, 1]
 	
 	# Symmetric Uncertainty (SU)
-	scores = cbind(scores, symmetrical.uncertainty(y ~ ., d))
-	colnames(scores)[ncol(scores)] = "Symmetric.Uncertainty"
+	scores[, "SU"] = symmetrical.uncertainty(y ~ ., d)[, 1]
 	
-	# Minimum Redundancy Maximum Relevance (MRMR)
-	d.mrmr = MRMR(d[,!(colnames(d) %in% c("y"))], d$y, ncol(d) - 1)$score
-	scores = merge(scores, d.mrmr, by = "row.names", all = T)
-	scores = scores %>%
-		remove_rownames() %>%
-		column_to_rownames(var = "Row.names")
-	colnames(scores)[ncol(scores)] = "MRMR"
+	# Minimum Redundancy Maximum Relevance (MR)
+	scores[, "MR"] = MRMR(d[, -ncol(d)], d$y, ncol(d) - 1)$score
 	
 	# Chi-Squared (CS)
-	d.chi = chi.squared(y ~ ., d)
-	scores = merge(scores, d.chi, by = "row.names", all = T)
-	scores = scores %>%
-		remove_rownames() %>%
-		column_to_rownames(var = "Row.names")
-	colnames(scores)[ncol(scores)] = "Chi.Squared"
+	scores[, "CS"] = chi.squared(y ~ ., d)[, 1]
+	
+	# normalizing
+	scores[, 1:4] = apply(scores[, 1:4], 2, normalize)
+	
+	# BAM
+	scores[, "BAM"] = apply(scores[, 1:4], 1, mean)
 	
 	# printing updated progress
 	done_percent = round(iteration_i / num_bootstraps * 100, 1)
-	text = paste("Iteration: ", iteration_i, "/", num_bootstraps, " (",
-							 done_percent, "%)", sep = "")
+	text = paste0("Iteration: ", iteration_i, "/", num_bootstraps, " (",
+							 done_percent, "%)")
 	print(text)
 	
 	# return importance scores of a single bootstrap
@@ -54,19 +52,17 @@ normalize = function(x) {
 
 # performs WAM on `data` ----
 # Preconditions:
-# - The target variable is named "y"
-# TODO (Dr. Ayman):
-# Please check if WAM is implemented correctly, especially if
-# the aggreagation and normalization are done in the right place.
-# I am using `apply(bootstraps, 1:2, mean)` to aggreagate the scores of each bootstrap. 
+# - The target variable should be the last column in `data` and should be named "y"
 
-wam = function(data, num_bootstraps = 500) {
+# TODO: rename the functions (wam and single.wam)
+
+aggregate.scores = function(data, num_bootstraps = 500) {
 	iteration_i = 0
 	
 	# bootstrapping `num_bootstraps` times
 	bootstraps = replicate(num_bootstraps, simplify = F, expr = { # TODO (Ahmad Alsaleh): try to use multi-core processing for replicate()
 		iteration_i <<- iteration_i + 1
-		single.wam_(data, iteration_i, num_bootstraps)
+		single.bootstrap_(data, iteration_i, num_bootstraps)
 	}) %>% abind::abind(along = 3)
 	
 	# aggreagating scores of all bootstraps using the arithmatice mean
