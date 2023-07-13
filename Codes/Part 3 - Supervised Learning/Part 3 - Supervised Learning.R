@@ -110,3 +110,4 @@ gplot = plot_heatmap(gpac, sample.label = "Diagnosis",taxa.label = "Genus",
 gplot$labels$fill = "Relative Abundance (%)"
 gplot + geom_vline(xintercept = 47.5, color = "black", linewidth = 1.5, linetype = "dashed") +
 	ggtitle("Relative Abundance of Top 50 Features")
+
