@@ -23,6 +23,7 @@ library(ggplot2)
 library(xlsx)
 library(vegan)
 library(dplyr)
+library(caret)
 library(phyloseq)
 library(stringr)
 
@@ -81,12 +82,11 @@ rm(p_value)
 # converting counts to proportions ----
 otu.data = otu.data / rowSums(otu.data) * 100
 
-'
 # removing near zero variance variables ----
-nzv.vars = caret::nearZeroVar(otu.data)
-otu.data[, -nzv.vars]
+nzv.vars = checkConditionalX(otu.data, meta.data$Diagnosis)
+otu.data = otu.data[, -nzv.vars]
 rm(nzv.vars)
-'
+
 # finding number of OTU's per group ----
 otu.sum = rowsum(otu.data, meta.data$Diagnosis)
 
@@ -99,30 +99,10 @@ length(intersect(crc.otus, normal.otus)) / ncol(otu.data)
 
 rm(crc.otus, normal.otus, otu.sum)
 
-# filtering data using Wilcox Test ----
-p_values = sapply(otu.data, function(col)
-	wilcox.test(col ~ meta.data$Diagnosis, exact = F)$p.value)
-
-p_values = sort(p_values, decreasing = T)
-
-# using a scree plot to choose a cut-off (at the elbow)
-scree.plot = ggplot(data.frame(Index = 1:length(p_values), p_value = p_values),
-										aes(x = Index, y = p_value)) + geom_line() + labs(x = "OTU Index")
-scree.plot
-
-cutoff = 955
-scree.plot + geom_vline(xintercept = cutoff, linetype = "dashed", color = "red") +
-	geom_text(x = cutoff, y = 0.1, hjust = -0.1, label = paste0("Index = ", cutoff), color = "red")
-
-selected.features = names(p_values[(cutoff + 1):length(p_values)])
-otu.data = otu.data[, selected.features]
-
-rm(scree.plot, selected.features, cutoff, p_values)
-
-# adding response to the last column
+# adding response to the last column ----
 otu.data = data.frame(otu.data, Diagnosis = meta.data$Diagnosis)
 
-# shuffling observations
+# shuffling observations ----
 otu.data = otu.data[sample(nrow(otu.data)), ]
 
 # exporting analysis dataset ----
@@ -138,6 +118,7 @@ tax = as.data.frame(t(stri_list2matrix(taxonomy.data)))
 rownames(tax) = names(taxonomy.data)
 colnames(tax) = c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 
+# TODO: put this in a function
 # adding prefix to each taxa level
 is.na(tax) <- tax == "Unclassified"
 tax$Kingdom = str_c('K_', tax$Kingdom)
@@ -290,3 +271,4 @@ abundances.difference = data.frame(Bacteria = rownames(abundances.table),
 																	 Abundances.Difference = abundances.difference)
 abundances.difference = abundances.difference[order(-abs(abundances.difference$Abundances.Difference)), ]
 abundances.difference
+
