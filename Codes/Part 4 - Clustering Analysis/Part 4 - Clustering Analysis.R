@@ -37,18 +37,14 @@ scree.plot = ggplot(data.frame(index = 1:nrow(features), score = features$BAM.Sc
 scree.plot
 
 # horizontal line
-h.cutoff = 0.22
-scree.plot + geom_hline(yintercept = h.cutoff, linetype = "dashed", color = "red")
-
-v.cutoff = which(features$BAM.Score < h.cutoff)[1]
-
+v.cutoff = 40
 # vertical line
 scree.plot + geom_vline(xintercept = v.cutoff, linetype = "dashed", color = "red") +
-	geom_hline(yintercept = h.cutoff, linetype = "dashed", color = "red") +
-	geom_text(x = v.cutoff, y = 0.1, hjust = -0.1, label = paste0("OTU Index = ", v.cutoff), color = "red")
+	geom_text(x = v.cutoff, y = 0.01, hjust = -0.1, label = paste0("OTU Index = ", v.cutoff), color = "red")
 
 features = features$OTU[1:v.cutoff]
 data = data[, c(features, "Diagnosis")]
 
 # clustering the observations
 kmeans.clusters(data, "PCA K-Means Clustering Using Important Features")
+
