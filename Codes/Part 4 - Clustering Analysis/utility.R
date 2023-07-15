@@ -1,5 +1,5 @@
 # function to calculate the percent of observations in the same cluster
-find.clustering.accuracy = function(clustering.scores) {
+find.clustering.accuracy_ = function(clustering.scores) {
 	t = table(clustering.scores$Cluster, clustering.scores$Diagnosis)
 	(sum(diag(t)) / sum(t)) %>% 
 		ifelse(. < 0.5, 1 - ., .)
@@ -9,7 +9,7 @@ find.clustering.accuracy = function(clustering.scores) {
 plot.clusters = function(clustering.scores, title) {
 	ggplot(clustering.scores, aes(x = PC1, y = PC2, color = Cluster, shape = Diagnosis)) +
 		labs(x = "Principal Component 1", y = "Principal Component 2",
-				 subtitle = sprintf("Clustering Accuracy: %.1f%%", find.clustering.accuracy(clustering.scores) * 100)) +
+				 subtitle = sprintf("Clustering Accuracy: %.1f%%", find.clustering.accuracy_(clustering.scores) * 100)) +
 		geom_point(size = 5, alpha = 0.8) + ggtitle(title) +
 		theme(plot.title = element_text(hjust = 0.5)) +
 		geom_point(size = 1, color = "black", alpha = 0.2)
@@ -29,5 +29,4 @@ kmeans.clusters = function(data, title) {
 	
 	# plotting clusters
 	plot.clusters(pca.scores, title)
-	
 }
