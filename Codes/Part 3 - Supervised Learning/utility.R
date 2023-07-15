@@ -31,7 +31,9 @@ generatePlot = function(AUC.values, model.name) {
 		theme(plot.title = element_text(hjust = 0.5, face = "bold")) +
 		scale_x_continuous(trans = reverselog_trans_()) +
 		geom_line(linetype = "dotdash", linewidth = 1) +
-		labs(linetype = "FS Method", color = "FS Method") + scale_y_continuous(
+		labs(linetype = "FS Method", color = "FS Method")
+	
+	plot = plot + scale_y_continuous(
 			breaks = seq(min(plot$data$value), max(plot$data$value), length.out = 5),
 			labels = scales::label_number(accuracy = 0.01))
 	
