@@ -1,3 +1,7 @@
+# libraries ----
+library(splitstackshape)
+library(FSelector)
+
 # function that performs WAM on a single bootstrap ----
 
 # feature selection techniques: Information Gain,

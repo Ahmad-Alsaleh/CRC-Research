@@ -25,15 +25,8 @@ Ahmad Alsaleh
 rm(list = ls())
 source("Codes/Part 2 - Feature Selection/utility.R")
 library(readxl)
-library(splitstackshape)
-library(FSelector)
-library(praznik)
-library(tibble)
 library(xlsx)
-library(caret)
 library(dplyr)
-library(ggplot2)
-library(plotROC)
 set.seed(42)
 
 # loading data set ----
