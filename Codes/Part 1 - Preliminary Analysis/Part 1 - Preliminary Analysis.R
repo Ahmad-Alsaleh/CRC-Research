@@ -13,23 +13,22 @@ and identify significant differences between groups in microbial data.
 set.seed(42)
 rm(list = ls())
 source("Codes/Part 1 - Preliminary Analysis/utility.R")
+library(readxl)
+library(dplyr)
+library(taRifx)
+library(summarytools)
+library(caret)
+library(xlsx)
 library(biomformat)
 library(qiimer)
 library(stringi)
-library(readxl)
-library(taRifx)
-library(summarytools)
-library(ggplot2)
-library(xlsx)
-library(vegan)
-library(dplyr)
-library(caret)
-library(phyloseq)
 library(stringr)
+library(phyloseq)
+library(vegan)
 
 # loading data set ----
-data = as.data.frame(read_excel("Output Datasets/dataset.xlsx"))
-data = textshape::column_to_rownames(data)
+data = read_excel("Output Datasets/dataset.xlsx") %>% as.data.frame %>%
+	(textshape::column_to_rownames)
 
 data$Sex = as.factor(data$Sex)
 data$Diagnosis = as.factor(data$Diagnosis)
@@ -40,12 +39,12 @@ meta.data = data[1:3]
 otu.data = data[-(1:3)]
 
 # summary statistics ----
-summarytools::view(stby(meta.data$Age, meta.data$Diagnosis, descr,transpose = T,
-												stats = c("mean", "sd")))
+summarytools::view(stby(meta.data$Age, meta.data$Diagnosis, descr, transpose = T,
+												stats = c("mean", "sd")), file = "Graphs/Age Description by Diagnosis.html", footnote = NA)
 summarytools::view(stby(meta.data$Age, meta.data$Sex, descr, transpose = T,
-												stats = c("mean", "sd")))
+												stats = c("mean", "sd")), file = "Graphs/Age Description by Sex.html", footnote = NA)
 summarytools::view(dfSummary(meta.data, plain.ascii = F, style = "grid",
-														 graph.magnif = 0.75, valid.col = F, tmp.img.dir = "/tmp"))
+														 graph.magnif = 0.75, valid.col = F, tmp.img.dir = "/tmp"), file = "Graphs/Meta Data Summary.html", footnote = NA)
 
 # univariate tests on metadata ----
 
@@ -114,11 +113,10 @@ write.xlsx(otu.data, "Output Datasets/Analysis Dataset.xlsx")
 # reading taxonomy data
 biom.data = read_biom("Original Datasets/BIOM Files/OTU_table.biom")
 taxonomy.data = biom_taxonomy(biom.data)
-tax = as.data.frame(t(stri_list2matrix(taxonomy.data)))
+tax = t(stri_list2matrix(taxonomy.data)) %>% as.data.frame
 rownames(tax) = names(taxonomy.data)
 colnames(tax) = c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 
-# TODO: put this in a function
 # adding prefix to each taxa level
 is.na(tax) <- tax == "Unclassified"
 tax$Kingdom = str_c('K_', tax$Kingdom)
@@ -150,19 +148,21 @@ phy.seq = prune_taxa(taxa_sums(phy.seq) > 0, phy.seq)
 lefse.dataset = create.lefse.dataset(phy.seq)
 
 # exporting LEfSe dataset
-lines <- c(paste(c('ID', names(lefse.dataset)), collapse = '\t'),
+lines = c(paste(c('ID', names(lefse.dataset)), collapse = '\t'),
 					 sapply(seq_len(nrow(lefse.dataset)), function(i)
 					 	paste(c(row.names(lefse.dataset)[i],
 					 					lefse.dataset[i, ]), collapse = '\t')))
 
-writeLines(lines, con = "Output Datasets/LEfSe_dataset.txt")
+writeLines(lines, con = "Output Datasets/LEfSe Dataset.txt")
 
 # alpha diversity ----
 plot = plot_richness(phy.seq, x = "Diagnosis", color = "Sex",
 										 measures = c("Chao1", "Shannon", "simpson", "ace"))
-plot = plot + geom_boxplot(data = plot$data, aes(x = Diagnosis, y = value,
-																								 color = "Sex"), alpha = 0.1)
-plot
+plot + geom_boxplot(data = plot$data, aes(x = Diagnosis, y = value, color = "Sex"),
+										alpha = 0.1)
+
+ggsave("Graphs/Alpha Diversity Measures on OTUs Abundances.png", width = 2931,
+			 height = 1782, units = "px")
 
 richness = estimate_richness(phy.seq, split = T, measures =
 														 	c("Chao1", "Shannon", "simpson", "ace"))
@@ -190,6 +190,9 @@ phy.seq.merged.top.20 = prune_taxa(top.20.otus, phy.seq.merged)
 plot = plot_bar(phy.seq.merged.top.20, "Diagnosis", fill = "Phylum") + coord_flip() +
 	ylab("Relative Abundance (%)") + labs(fill = "Abundant Phylum-level OTU")
 plot
+
+ggsave("Graphs/Abundance of Phylum-level Microbiota.png", width = 2931,
+			 height = 1782, units = "px")
 
 # comparing abundance values
 abundances = data.frame(
@@ -230,6 +233,9 @@ abundances.by.diagnosis
 plot = plot_bar(phy.seq.merged.top.20, "Diagnosis", fill = "Genus") + coord_flip() +
 	ylab("Relative Abundance (%)") + labs(fill = "Abundant Genus-level OTU")
 plot
+
+ggsave("Graphs/Abundance of Genus-level Microbiota.png", width = 2931,
+			 height = 1782, units = "px")
 
 abundances = data.frame(
 	Diagnosis = as.factor(plot$data$Diagnosis),

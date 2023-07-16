@@ -25,6 +25,7 @@ data[, -ncol(data)] = data[, -ncol(data)] %>% scale
 
 # clustering the observations
 kmeans.clusters(data, "PCA K-Means Clustering Using All Features")
+ggsave("Graphs/Clustering Using All Features.png", width = 2931, height = 1782, units = "px")
 
 # PCA k-means clustering using important features ----
 
@@ -39,12 +40,14 @@ scree.plot
 # horizontal line
 v.cutoff = 40
 # vertical line
-scree.plot + geom_vline(xintercept = v.cutoff, linetype = "dashed", color = "red") +
-	geom_text(x = v.cutoff, y = 0.01, hjust = -0.1, label = paste0("OTU Index = ", v.cutoff), color = "red")
+scree.plot + geom_vline(xintercept = v.cutoff, linetype = "dashed", color = "#D62828") +
+	geom_text(x = v.cutoff, y = 0.01, hjust = -0.1, label = paste0("OTU Index = ", v.cutoff), color = "#D62828")
+
+ggsave("Graphs/BAM Scores Scree Plot.png", width = 2931, height = 1782, units = "px")
 
 features = features$OTU[1:v.cutoff]
 data = data[, c(features, "Diagnosis")]
 
 # clustering the observations
-kmeans.clusters(data, "PCA K-Means Clustering Using Important Features")
-
+kmeans.clusters(data, "PCA K-Means Clustering Using Significant Features")
+ggsave("Graphs/Clustering Using Significant Features.png", width = 2931, height = 1782, units = "px")

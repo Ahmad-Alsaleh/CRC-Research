@@ -15,10 +15,7 @@ Ahmad Alsaleh
 Under the supervision of Dr. Ayman Alzaatreh.
 May 27th 2022.
 
-"
-
-# Requirements ----
-"
+Requirements:
 -	Response must be the last column of the dataset
 -	The columns of the features file must contain the different features
 	names ranked from the most to the least important.
@@ -71,7 +68,8 @@ RF.AUC = compute.AUCs(data, imp.features, RF.predict.func, randomForest::randomF
 RF.plot = generatePlot(RF.AUC, expression(bold(paste("Random Forest (m = ", sqrt(p), ")"))))
 
 # combining all graphs in one grid ---
-gridExtra::grid.arrange(SVM.plot, KNN.plot, NB.plot, RF.plot, nrow = 2, ncol = 2)
+plot = gridExtra::grid.arrange(SVM.plot, KNN.plot, NB.plot, RF.plot, nrow = 2, ncol = 2)
+ggsave("Graphs/AUC Graphs.png", plot, width = 2931, height = 1782, units = "px", dpi = 210)
 
 # extracting final features ----
 final.subset.name = "BAM"
@@ -111,3 +109,4 @@ gplot$labels$fill = "Relative Abundance (%)"
 gplot + geom_vline(xintercept = 47.5, color = "black", linewidth = 1.5, linetype = "dashed") +
 	ggtitle("Relative Abundance of Top 50 Features")
 
+ggsave("Graphs/Relative Abundance of Top 50 Features.png", width = 2931, height = 1782, units = "px")
