@@ -82,11 +82,6 @@ rm(p_value)
 # converting counts to proportions ----
 otu.data = otu.data / rowSums(otu.data) * 100
 
-# removing near zero variance variables ----
-nzv.vars = checkConditionalX(otu.data, meta.data$Diagnosis)
-otu.data = otu.data[, -nzv.vars]
-rm(nzv.vars)
-
 # finding number of OTU's per group ----
 otu.sum = rowsum(otu.data, meta.data$Diagnosis)
 
@@ -98,6 +93,11 @@ length(normal.otus)
 length(intersect(crc.otus, normal.otus)) / ncol(otu.data)
 
 rm(crc.otus, normal.otus, otu.sum)
+
+# removing near zero variance variables ----
+nzv.vars = checkConditionalX(otu.data, meta.data$Diagnosis)
+otu.data = otu.data[, -nzv.vars]
+rm(nzv.vars)
 
 # adding response to the last column ----
 otu.data = data.frame(otu.data, Diagnosis = meta.data$Diagnosis)
@@ -199,7 +199,7 @@ abundances = data.frame(
 )
 abundances = abundances %>%
 	group_by(Diagnosis, Bacteria) %>%
-	summarize(Abundance = sum(Abundance)) %>%
+	dplyr::summarize(Abundance = sum(Abundance)) %>%
 	ungroup %>% as.data.frame
 
 abundances.crc = abundances[abundances$Diagnosis == "CRC", ]
@@ -217,12 +217,12 @@ abundances.normal = abundances.normal[order(-abundances.normal$Abundance), ]
 cbind(abundances.crc, abundances.normal)
 
 # grouping by bacteria
-abundances.by.bacteria = abundances %>% group_by(Bacteria) %>% summarize(Abundance = sum(Abundance)) %>% as.data.frame
+abundances.by.bacteria = abundances %>% group_by(Bacteria) %>% dplyr::summarize(Abundance = sum(Abundance)) %>% as.data.frame
 abundances.by.bacteria = abundances.by.bacteria[order(-abundances.by.bacteria$Abundance), ]
 abundances.by.bacteria
 
 # grouping by Diagnosis
-abundances.by.diagnosis = abundances %>% group_by(Diagnosis) %>% summarize(Abundance = sum(Abundance)) %>% as.data.frame
+abundances.by.diagnosis = abundances %>% group_by(Diagnosis) %>% dplyr::summarize(Abundance = sum(Abundance)) %>% as.data.frame
 abundances.by.diagnosis = abundances.by.diagnosis[order(-abundances.by.diagnosis$Abundance), ]
 abundances.by.diagnosis
 
@@ -238,7 +238,7 @@ abundances = data.frame(
 )
 abundances = abundances %>%
 	group_by(Diagnosis, Bacteria) %>%
-	summarize(Abundance = sum(Abundance)) %>%
+	dplyr::summarize(Abundance = sum(Abundance)) %>%
 	ungroup %>% as.data.frame
 
 abundances.crc = abundances[abundances$Diagnosis == "CRC", ]
@@ -256,12 +256,12 @@ abundances.normal = abundances.normal[order(-abundances.normal$Abundance), ]
 cbind(abundances.crc, abundances.normal)
 
 # grouping by bacteria
-abundances.by.bacteria = abundances %>% group_by(Bacteria) %>% summarize(Abundance = sum(Abundance)) %>% as.data.frame
+abundances.by.bacteria = abundances %>% group_by(Bacteria) %>% dplyr::summarize(Abundance = sum(Abundance)) %>% as.data.frame
 abundances.by.bacteria = abundances.by.bacteria[order(-abundances.by.bacteria$Abundance), ]
 abundances.by.bacteria
 
 # grouping by Diagnosis
-abundances.by.diagnosis = abundances %>% group_by(Diagnosis) %>% summarize(Abundance = sum(Abundance)) %>% as.data.frame
+abundances.by.diagnosis = abundances %>% group_by(Diagnosis) %>% dplyr::summarize(Abundance = sum(Abundance)) %>% as.data.frame
 abundances.by.diagnosis = abundances.by.diagnosis[order(-abundances.by.diagnosis$Abundance), ]
 abundances.by.diagnosis
 
