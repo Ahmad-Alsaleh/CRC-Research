@@ -1,9 +1,8 @@
 "
 This code computes feature importance scores using WAB and BAM
 framework. In this framework, different feature selection techniques,
-like Information Gain, Symmetric Uncertainty, MRMR, Chi-Squared,
-Random Forest, are aggregated to give a robust
-list of the most important features.
+like Information Gain, Symmetric Uncertainty, Gain Ratio, and Chi-Squared,
+are aggregated to give a robust list of the most important features.
 
 After bootsrapping, the arithmetic mean is used to aggregate the
 scores of each technique.

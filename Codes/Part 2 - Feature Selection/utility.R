@@ -5,7 +5,7 @@ library(FSelector)
 # function that performs WAM on a single bootstrap ----
 
 # feature selection techniques: Information Gain,
-# Symmetric Uncertainty, MRMR, Chi-Squared
+# Symmetric Uncertainty, Gain Ratio, and Chi-Squared
 
 # Preconditions:
 # - The target variable is named "y"
