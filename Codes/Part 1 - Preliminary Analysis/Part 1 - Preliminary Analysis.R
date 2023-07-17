@@ -93,10 +93,15 @@ length(intersect(crc.otus, normal.otus)) / ncol(otu.data)
 
 rm(crc.otus, normal.otus, otu.sum)
 
-# removing near zero variance variables ----
-nzv.vars = checkConditionalX(otu.data, meta.data$Diagnosis)
-otu.data = otu.data[, -nzv.vars]
-rm(nzv.vars)
+# removing constant variables within each diagnosis ----
+const.vars = checkConditionalX(otu.data, meta.data$Diagnosis)
+
+length(const.vars)
+ncol(otu.data)
+
+otu.data = otu.data[, -const.vars]
+
+rm(const.vars)
 
 # adding response to the last column ----
 otu.data = data.frame(otu.data, Diagnosis = meta.data$Diagnosis)
