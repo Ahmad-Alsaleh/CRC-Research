@@ -38,14 +38,14 @@ scree.plot = ggplot(data.frame(index = 1:nrow(features), score = features$BAM.Sc
 scree.plot
 
 # horizontal line
-v.cutoff = 40
+cutoff = 40
 # vertical line
-scree.plot + geom_vline(xintercept = v.cutoff, linetype = "dashed", color = "#D62828") +
-	geom_text(x = v.cutoff, y = 0.01, hjust = -0.1, label = paste0("OTU Index = ", v.cutoff), color = "#D62828")
+scree.plot + geom_vline(xintercept = cutoff, linetype = "dashed", color = "#D62828") +
+	geom_text(x = cutoff, y = 0.01, hjust = -0.1, label = paste0("OTU Index = ", cutoff), color = "#D62828")
 
 ggsave("Graphs/BAM Scores Scree Plot.png", width = 2931, height = 1782, units = "px")
 
-features = features$OTU[1:v.cutoff]
+features = features$OTU[1:cutoff]
 data = data[, c(features, "Diagnosis")]
 
 # clustering the observations
