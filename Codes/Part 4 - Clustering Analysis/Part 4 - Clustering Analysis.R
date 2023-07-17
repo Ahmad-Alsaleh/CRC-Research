@@ -43,7 +43,7 @@ cutoff = 40
 scree.plot + geom_vline(xintercept = cutoff, linetype = "dashed", color = "#D62828") +
 	geom_text(x = cutoff, y = 0.01, hjust = -0.1, label = paste0("OTU Index = ", cutoff), color = "#D62828")
 
-ggsave("Graphs/BAM Scores Scree Plot.png", width = 2931, height = 1782, units = "px")
+ggsave("Graphs/BAM Scores Scree Plot.png", width = 2931, height = 891, units = "px")
 
 features = features$OTU[1:cutoff]
 data = data[, c(features, "Diagnosis")]
