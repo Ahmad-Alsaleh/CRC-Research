@@ -61,7 +61,7 @@ compute.AUC_ = function(features, data.train, data.test, predict.func, subset.si
 # Arguments:
 # `data`: the dataset used to fit the model. Last column contains the response
 #				and should be called `y`. 
-# `imp.features`: a data.frame where each column contains the names of the
+# `imp.features.names`: a data.frame where each column contains the names of the
 #				features to be used in fitting the model.
 # `predict.func`: a function with two arguments: `model.fit` and `data.train` in
 #				this order and returns the predictions probabilities of levels(data$y)[2].
@@ -77,19 +77,19 @@ compute.AUC_ = function(features, data.train, data.test, predict.func, subset.si
 #				used when fitting the model. If a single value is passed then it
 #				corresponds to the number of subset sizes to use.
 
-compute.AUCs = function(data, imp.features, predict.func, model.func, ..., folds = 5, subset.sizes = 10) {
+compute.AUCs = function(data, imp.features.names, predict.func, model.func, ..., folds = 5, subset.sizes = 10) {
 	if (length(folds) == 1)
 		folds = caret::createFolds(data$y, k = folds)
 	
 	if (length(subset.sizes) == 1)
-		subset.sizes = floor(exp(seq(log(5), log(nrow(imp.features)),
+		subset.sizes = floor(exp(seq(log(5), log(nrow(imp.features.names)),
 																 length.out = subset.sizes)))
 	
 	# `AUCs` stores the AUC values of a single fold
 	# rows are number of features used (the size of the subset)
 	# and columns are the features selection methods
-	AUCs = matrix(nrow = length(subset.sizes), ncol = ncol(imp.features),
-								dimnames = list(subset.sizes, colnames(imp.features)))
+	AUCs = matrix(nrow = length(subset.sizes), ncol = ncol(imp.features.names),
+								dimnames = list(subset.sizes, colnames(imp.features.names)))
 	
 	# setting up parallel processing for CV (Windows not supported)
 	if (Sys.info()["sysname"] == "Windows") {
@@ -103,11 +103,11 @@ compute.AUCs = function(data, imp.features, predict.func, model.func, ..., folds
 	
 	# cross validation to find AUC values
 	cv.AUCs = parallel::mclapply(folds, mc.cores = cores_n, FUN = function(fold) {
-		for(feature_i in 1:ncol(imp.features)) {
+		for(feature_i in 1:ncol(imp.features.names)) {
 			for(subset.size_i in 1:length(subset.sizes)) {
 				set.seed(42)
 				AUCs[subset.size_i, feature_i] =
-					compute.AUC_(imp.features[feature_i], data[-fold, ], data[fold, ],
+					compute.AUC_(imp.features.names[feature_i], data[-fold, ], data[fold, ],
 											 predict.func, subset.sizes[subset.size_i], model.func, ...)
 			} # next subset of features
 		} # next feature selection method
