@@ -113,6 +113,9 @@ OTU = t(data[, -(1:3)]) %>% as.matrix %>% otu_table(taxa_are_rows = T)
 TAX = read_excel("Output Datasets/taxonomy.xlsx") %>% (textshape::column_to_rownames) %>%
 	as.matrix %>% tax_table
 
+OTU = OTU[final.subset$OTU, ]
+TAX = TAX[final.subset$OTU, ]
+
 phy.seq = phyloseq(OTU, TAX)
 sample_data(phy.seq) = data[, 1:3]
 
