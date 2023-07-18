@@ -131,3 +131,4 @@ gplot$labels$fill = "Relative Abundance (%)"
 gplot + geom_vline(xintercept = 47.5, color = "black", linewidth = 1.5, linetype = "dashed")
 
 ggsave("Graphs/Relative Abundance of Significant Features.png", width = 2931, height = 1782, units = "px")
+
