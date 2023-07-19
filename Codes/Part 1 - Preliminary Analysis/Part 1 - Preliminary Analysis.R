@@ -141,17 +141,18 @@ lefse.dataset = create.lefse.dataset(phy.seq)
 
 # exporting LEfSe dataset
 lines = c(paste(c('ID', names(lefse.dataset)), collapse = '\t'),
-					 sapply(seq_len(nrow(lefse.dataset)), function(i)
-					 	paste(c(row.names(lefse.dataset)[i],
-					 					lefse.dataset[i, ]), collapse = '\t')))
+					sapply(seq_len(nrow(lefse.dataset)), function(i)
+						paste(c(row.names(lefse.dataset)[i],
+										lefse.dataset[i, ]), collapse = '\t')))
 
 writeLines(lines, con = "Output Datasets/LEfSe Dataset.txt")
 
 # alpha diversity ----
 plot = plot_richness(phy.seq, x = "Diagnosis", color = "Sex",
 										 measures = c("Chao1", "Shannon", "simpson", "ace"))
-plot + geom_boxplot(data = plot$data, aes(x = Diagnosis, y = value, color = "Sex"),
-										alpha = 0.1)
+
+plot + geom_boxplot(data = plot$data, aes(x = Diagnosis, y = value),
+										color = "#53B74C", alpha = 0.1)
 
 ggsave("Graphs/Alpha Diversity Measures on OTUs Abundances.png", width = 2931,
 			 height = 1782, units = "px")
@@ -169,6 +170,8 @@ p.adjust(richness.p.values, method = "fdr") %>% round(4)
 
 # beta diversity ----
 phy.seq = transform_sample_counts(phy.seq, function(x) x / sum(x) * 100)
+
+# analysis of similarity
 bray.dist = distance(phy.seq, method = "bray")
 anosim(bray.dist, sample_data(phy.seq)$Diagnosis)
 
