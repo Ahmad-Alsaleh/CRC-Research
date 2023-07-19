@@ -50,30 +50,26 @@ summarytools::view(dfSummary(meta.data, plain.ascii = F, style = "grid",
 
 # Age vs. Diagnosis
 p_value = wilcox.test(meta.data$Age ~ meta.data$Diagnosis, exact = F)$p.value
-p_value
-
 if (p_value <= 0.05) {
-	print("Age and Diagnosis are different")
+	sprintf("Age and Diagnosis are significantly different (p-value: %.4f).", p_value)
 } else {
-	print("Age and Diagnosis are not different")
+	sprintf("Age and Diagnosis are NOT significantly different (p-value: %.4f).", p_value)
 }
 
 # Gender vs. Diagnosis
 p_value = fisher.test(meta.data$Sex, meta.data$Diagnosis)$p.value
-p_value
 if (p_value <= 0.05) {
-	print("Sex and Diagnosis are different")
+	sprintf("Sex and Diagnosis are significantly different (p-value: %.4f).", p_value)
 } else {
-	print("Sex and Diagnosis are not different")
+	sprintf("Sex and Diagnosis are NOT significantly different (p-value: %.4f).", p_value)
 }
 
 # Age vs. Gender
 p_value = wilcox.test(meta.data$Age ~ meta.data$Sex, exact = F)$p.value
-p_value
 if (p_value <= 0.05) {
-	print("Age and Gender are different")
+	sprintf("Age and Gender are significantly different (p-value: %.4f).", p_value)
 } else {
-	print("Age and Gender are not different")
+	sprintf("Age and Gender are NOT significantly different (p-value: %.4f).", p_value)
 }
 
 rm(p_value)
@@ -87,20 +83,18 @@ otu.sum = rowsum(otu.data, meta.data$Diagnosis)
 crc.otus = which(otu.sum["CRC", ] != 0)
 normal.otus = which(otu.sum["Normal", ] != 0)
 
-length(crc.otus)
-length(normal.otus)
-length(intersect(crc.otus, normal.otus)) / ncol(otu.data)
+sprintf("Number of OTUs in CRC patients: %d", length(crc.otus))
+sprintf("Number of OTUs in healthy patients: %d", length(normal.otus))
+(length(intersect(crc.otus, normal.otus)) / ncol(otu.data)) %>% 
+	sprintf("Number of OTUs in both groups: %.4f", .)
 
 rm(crc.otus, normal.otus, otu.sum)
 
 # removing constant variables within each diagnosis ----
 const.vars = checkConditionalX(otu.data, meta.data$Diagnosis)
-
-length(const.vars)
-ncol(otu.data)
-
 otu.data = otu.data[, -const.vars]
-
+sprintf("Number of removed constant features: %d", length(const.vars))
+sprintf("Number of remaining features: %d", ncol(otu.data))
 rm(const.vars)
 
 # adding response to the last column ----
