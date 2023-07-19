@@ -175,6 +175,20 @@ phy.seq = transform_sample_counts(phy.seq, function(x) x / sum(x) * 100)
 bray.dist = distance(phy.seq, method = "bray")
 anosim(bray.dist, sample_data(phy.seq)$Diagnosis)
 
+###
+# PCA of Bray-Curtis distances
+phy.ord = ordinate(phy.seq, "PCoA", "bray")
+
+rel.eig.val = phy.ord$values$Relative_eig
+x.lab = sprintf("PC1 (%.1f%%)", rel.eig.val[1] * 100)
+y.lab = sprintf("PC2 (%.1f%%)", rel.eig.val[2] * 100)
+
+plot_ordination(phy.seq, phy.ord, color = "Diagnosis", axes = c(2, 3)) +
+	geom_point(size = 6, alpha = 0.7) + xlab(x.lab) + ylab(y.lab)
+
+###
+
+
 # creating abundance plots of most abundant OTUs by phylum and genus levels ----
 phy.seq.merged = merge_samples(phy.seq, group = "Diagnosis")
 sample_data(phy.seq.merged)$Diagnosis = levels(sample_data(phy.seq)$Diagnosis)
