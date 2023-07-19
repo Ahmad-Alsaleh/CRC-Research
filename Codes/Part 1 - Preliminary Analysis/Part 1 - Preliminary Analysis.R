@@ -93,8 +93,7 @@ rm(crc.otus, normal.otus, otu.sum)
 # removing constant variables within each diagnosis ----
 const.vars = checkConditionalX(otu.data, meta.data$Diagnosis)
 otu.data = otu.data[, -const.vars]
-sprintf("Number of removed constant features: %d", length(const.vars))
-sprintf("Number of remaining features: %d", ncol(otu.data))
+sprintf("Number of non-constant features: %d", ncol(otu.data))
 rm(const.vars)
 
 # adding response to the last column ----
@@ -117,21 +116,15 @@ rownames(tax) = names(taxonomy.data)
 colnames(tax) = c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 
 # adding prefix to each taxa level
-is.na(tax) <- tax == "Unclassified"
-tax$Kingdom = str_c('K_', tax$Kingdom)
-tax$Phylum = str_c('P_', tax$Phylum)
-tax$Class = str_c('C_', tax$Class)
-tax$Order = str_c('O_', tax$Order)
-tax$Family = str_c('F_', tax$Family)
-tax$Genus = str_c('G_', tax$Genus)
-tax$Species = str_c('S_', tax$Species)
+tax = add.prefix(tax)
 
 # handling unclassified (NA) values
 taxonomy.data = handle.unclassified.values(tax)
 
-rm(tax, biom.data)
-
+# exporting taxonomy data
 write.xlsx(taxonomy.data, "Output Datasets/taxonomy.xlsx")
+
+rm(tax, biom.data)
 
 # creating phyloseq object
 OTU = t(data[, -(1:3)]) %>% as.matrix %>% otu_table(taxa_are_rows = T)
@@ -171,7 +164,8 @@ richness$se.ACE = NULL
 
 richness.p.values = sapply(richness[, -ncol(richness)], function(x)
 	wilcox.test(x ~ richness$Diagnosis, exact = F)$p.value)
-p.adjust(richness.p.values, method = "fdr")
+print("p-values of alpha diversity metrics:")
+p.adjust(richness.p.values, method = "fdr") %>% round(4)
 
 # beta diversity ----
 phy.seq = transform_sample_counts(phy.seq, function(x) x / sum(x) * 100)

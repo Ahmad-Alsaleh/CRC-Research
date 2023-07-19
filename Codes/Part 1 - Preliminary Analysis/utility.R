@@ -115,3 +115,17 @@ handle.unclassified.values = function(tax) {
 	
 	return(tax)
 }
+
+# adds prefix to each taxa level
+add.prefix = function(tax) {
+	is.na(tax) = tax == "Unclassified"
+	tax$Kingdom = str_c('K_', tax$Kingdom)
+	tax$Phylum = str_c('P_', tax$Phylum)
+	tax$Class = str_c('C_', tax$Class)
+	tax$Order = str_c('O_', tax$Order)
+	tax$Family = str_c('F_', tax$Family)
+	tax$Genus = str_c('G_', tax$Genus)
+	tax$Species = str_c('S_', tax$Species)
+	
+	return(tax)
+}
