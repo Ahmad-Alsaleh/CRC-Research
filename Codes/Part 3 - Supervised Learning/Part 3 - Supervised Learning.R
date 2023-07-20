@@ -84,13 +84,13 @@ taxonomy = read_excel("Output Datasets/taxonomy.xlsx") %>%
 	(textshape::column_to_rownames)
 taxonomy = taxonomy[imp.features.names, c("Family", "Genus", "Species")]
 
-final.subset = data.frame(OTU = imp.features.names, `BAM Score` = scores,
+final.subset = data.frame(OTU = imp.features.names, `Imp Score` = scores,
 													taxonomy, row.names = NULL)
 
 # using scree plot to choose cutoff for top features
 scree.plot = ggplot(
-	data.frame(index = 1:nrow(final.subset), score = final.subset$BAM.Score),
-	aes(x = index, y = score)) + geom_line() + labs(x = "OTU Index", y = "BAM Score")
+	data.frame(index = 1:nrow(final.subset), score = final.subset$Imp.Score),
+	aes(x = index, y = score)) + geom_line() + labs(x = "OTU Index", y = "Imp Score")
 scree.plot
 
 # drawing vertical line
