@@ -33,7 +33,7 @@ source("Codes/Part 3 - Supervised Learning/utility.R")
 # reading files ----
 
 # reading the dataset file
-data = read_excel("Output Datasets/Analysis Dataset.xlsx") %>% as.data.frame %>%
+data = read_excel("Output Datasets/Analysis Dataset.xlsx") %>%
 	(textshape::column_to_rownames)
 colnames(data)[ncol(data)] = "y"
 data$y = as.factor(data$y)
@@ -107,11 +107,12 @@ final.subset = final.subset[1:cutoff, ]
 xlsx::write.xlsx(final.subset, "Output Datasets/Final Selected OTUs.xlsx", row.names = F)
 
 # heatmap of relative abundance of the selected variables ----
-data = read_excel("Output Datasets/dataset.xlsx") %>% (textshape::column_to_rownames)
+data = read_excel("Output Datasets/dataset.xlsx") %>%
+	(textshape::column_to_rownames)
 
 OTU = t(data[, -(1:3)]) %>% as.matrix %>% otu_table(taxa_are_rows = T)
-TAX = read_excel("Output Datasets/taxonomy.xlsx") %>% (textshape::column_to_rownames) %>%
-	as.matrix %>% tax_table
+TAX = read_excel("Output Datasets/taxonomy.xlsx") %>%
+	(textshape::column_to_rownames) %>% as.matrix %>% tax_table
 
 OTU = OTU[final.subset$OTU, ]
 TAX = TAX[final.subset$OTU, ]

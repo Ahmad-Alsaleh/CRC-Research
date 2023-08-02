@@ -27,7 +27,7 @@ library(phyloseq)
 library(vegan)
 
 # loading data set ----
-data = read_excel("Output Datasets/dataset.xlsx") %>% as.data.frame %>%
+data = read_excel("Output Datasets/dataset.xlsx") %>%
 	(textshape::column_to_rownames)
 
 data$Sex = as.factor(data$Sex)

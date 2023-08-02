@@ -16,9 +16,8 @@ source("Codes/Part 4 - Clustering Analysis/utility.R")
 # PCA k-means clustering using all features ----
 
 # reading and scaling the dataset
-data = readxl::read_excel(
-	"Output Datasets/Analysis Dataset.xlsx") %>% 
-	as.data.frame %>% (textshape::column_to_rownames)
+data = readxl::read_excel("Output Datasets/Analysis Dataset.xlsx") %>%
+	(textshape::column_to_rownames)
 data$Diagnosis = as.factor(data$Diagnosis)
 
 data[, -ncol(data)] = data[, -ncol(data)] %>% scale

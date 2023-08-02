@@ -94,7 +94,7 @@ compute.AUCs = function(data, imp.features.names, predict.func, model.func, ...,
 	# setting up parallel processing for CV (Windows not supported)
 	if (Sys.info()["sysname"] == "Windows") {
 		cores_n = 1
-		message("Multi-core processing on is not supported for Windows.\nRunning on a single core\n")
+		message("Multi-core processing on is not currently supported for Windows.\nRunning on a single core\n")
 	}
 	else {
 		cores_n = parallelly::availableCores()

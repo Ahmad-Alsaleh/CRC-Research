@@ -30,7 +30,7 @@ set.seed(42)
 
 # loading data set ----
 data = read_excel("Output Datasets/Analysis Dataset.xlsx") %>%
-	as.data.frame %>% (textshape::column_to_rownames)
+	(textshape::column_to_rownames)
 data$Diagnosis = as.factor(data$Diagnosis)
 colnames(data)[ncol(data)] = "y"
 str(data[, (ncol(data) - 2):ncol(data)])
