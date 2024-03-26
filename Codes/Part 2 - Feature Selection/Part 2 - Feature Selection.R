@@ -29,23 +29,23 @@ library(dplyr)
 set.seed(42)
 
 # loading data set ----
-data = read_excel("Output Datasets/Analysis Dataset.xlsx") %>%
-	(textshape::column_to_rownames)
-data$Diagnosis = as.factor(data$Diagnosis)
-colnames(data)[ncol(data)] = "y"
+data <- read_excel("Output Datasets/Analysis Dataset.xlsx") %>%
+  (textshape::column_to_rownames)
+data$Diagnosis <- as.factor(data$Diagnosis)
+colnames(data)[ncol(data)] <- "y"
 str(data[, (ncol(data) - 2):ncol(data)])
 
 # feature selection ----
-aggregated.scores = aggregate.scores(data)
+aggregated.scores <- aggregate.scores(data)
 
 # sorting OTUs by importance scores of each method ----
-top.features = matrix(nrow = nrow(aggregated.scores), ncol = ncol(aggregated.scores))
-colnames(top.features) = colnames(aggregated.scores)
+top.features <- matrix(nrow = nrow(aggregated.scores), ncol = ncol(aggregated.scores))
+colnames(top.features) <- colnames(aggregated.scores)
 
-for (col_i in 1:ncol(aggregated.scores))
-	top.features[, col_i] = rownames(aggregated.scores)[order(-aggregated.scores[, col_i])]
+for (col_i in 1:ncol(aggregated.scores)) {
+  top.features[, col_i] <- rownames(aggregated.scores)[order(-aggregated.scores[, col_i])]
+}
 
 # exporting results ----
 write.xlsx(aggregated.scores, "Output Datasets/Bootstrapped Importance Scores.xlsx")
 write.xlsx(top.features, "Output Datasets/Top Features.xlsx", row.names = F)
-
