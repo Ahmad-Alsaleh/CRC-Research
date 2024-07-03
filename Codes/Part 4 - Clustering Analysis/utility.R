@@ -7,7 +7,7 @@ find.clustering.accuracy_ <- function(clustering.scores) {
 
 # function to generate a plot with predefined custom aesthetics
 plot.clusters <- function(clustering.scores, title) {
-  ggplot(clustering.scores, aes(x = PC1, y = PC2, color = Cluster, shape = Diagnosis)) +
+  ggplot(clustering.scores, aes(x = PC1, y = PC2, color = Diagnosis, shape = Cluster)) +
     labs(
       x = "Principal Component 1", y = "Principal Component 2",
       subtitle = sprintf("Clustering Accuracy: %.1f%%", find.clustering.accuracy_(clustering.scores) * 100)
